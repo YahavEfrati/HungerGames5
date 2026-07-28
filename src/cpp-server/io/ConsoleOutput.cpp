@@ -1,0 +1,5 @@
+#include "ConsoleOutput.h"
+#include <iostream>
+void ConsoleOutput::giveOutput(const std::string& text){
+	std::cout << text << std::endl;
+}

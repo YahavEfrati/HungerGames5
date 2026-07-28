@@ -1,0 +1,284 @@
+.wolt-modal-content {
+    background-color: var(--wolt-secondary-bg) !important;
+    border-radius: 16px;
+    border: 1px solid var(--wolt-muted-border);
+    overflow: hidden;
+    color: var(--wolt-text-primary) !important;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.wolt-modal-header {
+    position: relative;
+    padding: 0;
+    border-bottom: none;
+    height: 300px; /* Large cover image height */
+    overflow: hidden;
+}
+
+.wolt-modal-close-btn {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 36px;
+    height: 36px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color 0.2s;
+}
+
+.wolt-modal-close-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.wolt-modal-action-btn-danger {
+    background-color: #e25b5b;
+    border: none;
+    color: white;
+}
+
+.wolt-modal-action-btn-danger:hover:not(:disabled) {
+    background-color: #d14a4a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(226, 91, 91, 0.3);
+}
+
+.wolt-modal-action-btn-danger:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.wolt-modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wolt-modal-body {
+    padding: 24px;
+}
+
+.wolt-modal-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.wolt-modal-badge {
+    background-color: var(--wolt-disabled-bg) !important;
+    color: #00c2e8 !important;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-bottom: 16px;
+}
+
+.wolt-modal-price {
+    color: #00c2e8;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: inline-block;
+    margin-left: 12px;
+}
+
+.wolt-modal-desc {
+    color: var(--wolt-text-secondary) !important;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.wolt-modal-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.wolt-modal-textarea {
+    background-color: var(--wolt-disabled-bg);
+    border: 1px solid var(--wolt-muted-border);
+    border-radius: 12px;
+    color: var(--wolt-text-primary);
+    padding: 12px;
+    resize: none;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.wolt-modal-textarea:focus {
+    background-color: var(--wolt-disabled-bg);
+    border-color: #00c2e8;
+    outline: none;
+    box-shadow: none;
+    color: var(--wolt-text-primary);
+}
+
+.wolt-modal-footer {
+    border-top: none;
+    padding: 16px 24px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.wolt-quantity-selector {
+    display: flex;
+    align-items: center;
+    background-color: var(--wolt-disabled-bg) !important;
+    border-radius: 24px;
+    padding: 4px;
+}
+
+.wolt-qty-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: #00c2e8;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.wolt-qty-btn:hover {
+    background-color: var(--wolt-muted-border) !important;
+}
+
+.wolt-qty-value {
+    width: 30px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.wolt-modal-action-btn {
+    background-color: #00c2e8 !important;
+    border: none !important;
+    border-radius: 24px !important;
+    color: #0a1118 !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: filter 0.2s !important;
+}
+
+.wolt-modal-action-btn.btn-secondary {
+    background-color: var(--wolt-disabled-bg) !important;
+    color: var(--wolt-text-primary) !important;
+    border: 1px solid var(--wolt-muted-border) !important;
+}
+
+.wolt-modal-action-btn:hover {
+    filter: brightness(1.1);
+}
+
+.wolt-modal-action-text {
+    flex-grow: 1;
+    text-align: center;
+}
+
+.wolt-modal-action-price {
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+/* Edit Mode Styles */
+.wolt-modal-input {
+    background-color: var(--wolt-disabled-bg) !important;
+    border: 1px solid var(--wolt-muted-border) !important;
+    border-radius: 8px;
+    color: var(--wolt-text-primary) !important;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.wolt-modal-input:focus {
+    outline: none;
+    border-color: #00c2e8;
+    background-color: var(--wolt-disabled-bg) !important;
+    color: var(--wolt-text-primary) !important;
+}
+
+.wolt-edit-label {
+    font-size: 0.85rem;
+    color: var(--wolt-text-secondary) !important;
+    margin-bottom: 4px;
+    display: block;
+}
+
+/* Drag & Drop Upload Styles */
+.wolt-modal-header.dropzone {
+    cursor: pointer;
+    background-color: var(--wolt-disabled-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease, border 0.2s ease;
+}
+
+.wolt-modal-header.dropzone.dragging {
+    background-color: rgba(0, 194, 232, 0.1);
+    border: 2px dashed #00c2e8;
+}
+
+.wolt-upload-placeholder {
+    text-align: center;
+    color: var(--wolt-text-secondary);
+}
+
+.wolt-upload-placeholder .upload-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+.wolt-upload-placeholder .upload-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Outline button */
+.wolt-btn-outline {
+    background: transparent;
+    border: 1px solid var(--wolt-muted-border);
+    color: var(--wolt-text-primary);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.wolt-btn-outline:hover:not(:disabled) {
+    background-color: var(--wolt-disabled-bg);
+    border-color: var(--wolt-text-secondary);
+}
+
+.wolt-modal-action-btn-danger {
+    background-color: #e25b5b !important;
+    border: none !important;
+    color: white !important;
+}
+
+.wolt-modal-action-btn-danger:hover:not(:disabled) {
+    background-color: #d14a4a !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(226, 91, 91, 0.3) !important;
+}
+
+.wolt-modal-action-btn-danger:active:not(:disabled) {
+    transform: translateY(0);
+}

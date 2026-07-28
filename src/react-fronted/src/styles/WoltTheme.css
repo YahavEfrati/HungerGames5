@@ -1,0 +1,162 @@
+/* WoltTheme CSS Variables */
+
+:root {
+  /* Dark Mode variables (Default) */
+  --wolt-primary-bg: #0a0c17;
+  --wolt-secondary-bg: #161929;
+  --wolt-muted-border: rgba(255, 255, 255, 0.15);
+  --wolt-hover-blue: #009de0;
+  --wolt-disabled-bg: #171924;
+  
+  --wolt-text-primary: #ffffff;
+  --wolt-text-secondary: rgba(255, 255, 255, 0.7);
+  --wolt-card-bg: #161929;
+  --wolt-checkout-gradient-end: #0a0c17;
+  
+  /* Map legacy theme selectors to new variables */
+  --bg-main: var(--wolt-primary-bg);
+  --bg-card: var(--wolt-secondary-bg);
+  --bg-navbar: var(--wolt-secondary-bg);
+  --bg-input: #292E45;
+  --bg-dropdown: var(--wolt-secondary-bg);
+  --text-primary: var(--wolt-text-primary);
+  --text-secondary: var(--wolt-text-secondary);
+  --border-color: var(--wolt-muted-border);
+}
+
+[data-theme="light"] {
+  /* Light Mode variables */
+  --wolt-primary-bg: #f8f9fa;
+  --wolt-secondary-bg: #ffffff;
+  --wolt-muted-border: rgba(0, 0, 0, 0.15);
+  --wolt-hover-blue: #009de0;
+  --wolt-disabled-bg: #e4e6eb;
+  
+  --wolt-text-primary: #1C1F31;
+  --wolt-text-secondary: #4b4f56;
+  --wolt-card-bg: #ffffff;
+  --wolt-checkout-gradient-end: #f8f9fa;
+  
+  /* Map legacy theme selectors */
+  --bg-main: var(--wolt-primary-bg);
+  --bg-card: var(--wolt-secondary-bg);
+  --bg-navbar: var(--wolt-secondary-bg);
+  --bg-input: #e4e6eb;
+  --bg-dropdown: var(--wolt-secondary-bg);
+  --text-primary: var(--wolt-text-primary);
+  --text-secondary: var(--wolt-text-secondary);
+  --border-color: var(--wolt-muted-border);
+}
+
+/* Global body elements settings */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--wolt-primary-bg) !important;
+  color: var(--wolt-text-primary) !important;
+  font-family: system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Base style mappings for Navbar elements to respond to theme state */
+.bg-wolt-secondary {
+  background-color: var(--bg-navbar) !important;
+  transition: background-color 0.2s ease;
+}
+
+.wolt-navbar-brand {
+  color: var(--text-primary) !important;
+}
+
+.wolt-navbar-link {
+  color: var(--text-secondary) !important;
+}
+
+.wolt-navbar-link:hover {
+  color: var(--text-primary) !important;
+}
+
+.wolt-navbar-text {
+  color: var(--text-primary) !important;
+}
+
+/* Scoped rules to force Login/Register (AuthPage) to remain Dark Mode */
+.page-wrapper-loginAndRegister {
+  --wolt-primary-bg: #0a0c17 !important;
+  --wolt-secondary-bg: #161929 !important;
+  --wolt-muted-border: rgba(255, 255, 255, 0.15) !important;
+  --wolt-hover-blue: #009de0 !important;
+  --wolt-disabled-bg: #171924 !important;
+  --wolt-text-primary: #ffffff !important;
+  --wolt-text-secondary: rgba(255, 255, 255, 0.7) !important;
+  --wolt-card-bg: #161929 !important;
+  
+  --bg-main: var(--wolt-primary-bg) !important;
+  --bg-card: var(--wolt-secondary-bg) !important;
+  --bg-navbar: var(--wolt-secondary-bg) !important;
+  --bg-input: #292E45 !important;
+  --bg-dropdown: var(--wolt-secondary-bg) !important;
+  --text-primary: var(--wolt-text-primary) !important;
+  --text-secondary: var(--wolt-text-secondary) !important;
+  --border-color: var(--wolt-muted-border) !important;
+  
+  background-color: #0a0c17 !important;
+  color: #ffffff !important;
+  min-height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+body:has(.page-wrapper-loginAndRegister) {
+  background-color: #0a0c17 !important;
+  color: #ffffff !important;
+}
+
+/* Theme-aware input placeholders */
+input::placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.6;
+}
+
+input::-webkit-input-placeholder {
+  color: var(--text-secondary) !important;
+  opacity: 0.6;
+}
+
+/* Modal input overrides for Light Mode */
+[data-theme="light"] .modal .login-dark-input {
+  color: var(--text-primary) !important;
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* Location Modal label and title styling */
+.wolt-form-label {
+  color: var(--text-primary) !important;
+}
+.modal-title {
+  color: var(--text-primary) !important;
+}
+
+/* Dropdown item hover & focus contrast overrides */
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] .dropdown-item:hover,
+[data-theme="light"] .dropdown-item:focus {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  color: var(--text-primary) !important;
+}
+
+
+

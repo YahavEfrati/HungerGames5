@@ -1,0 +1,103 @@
+/* AuthPage.css */
+
+.auth-container {
+    width: 100%;
+    position: relative;
+    transition: max-width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden; /* Clips elements during width/height morphing */
+}
+
+.auth-container.show-login {
+    max-width: 380px;
+}
+
+.auth-container.show-register {
+    max-width: 450px;
+}
+
+/* Base form box styling for transitions */
+.auth-form-box {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.5s;
+}
+
+/* Active form: visible, layered on top, interactive */
+.auth-form-box.active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    pointer-events: auto;
+    visibility: visible;
+    z-index: 2;
+}
+
+/* Inactive form: hidden, layered below, non-interactive */
+.auth-form-box.inactive {
+    z-index: 1;
+}
+
+/* Slide direction: Login slides right, Register slides left */
+.show-login .auth-form-box.inactive {
+    transform: translate3d(50px, 0, 0);
+}
+.show-register .auth-form-box.inactive {
+    transform: translate3d(-50px, 0, 0);
+}
+
+/* =========================================
+   Back Button Styling
+   ========================================= */
+
+.register-header-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 24px;
+}
+
+.back-to-login-btn {
+    background: none;
+    border: none;
+    color: #ffffff !important;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    outline: none;
+}
+
+.back-to-login-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(-4px);
+}
+
+.back-to-login-btn:focus-visible {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.back-to-login-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke: #ffffff;
+}
+
+/* Reset default page-wrapper to align properly with layout */
+.page-wrapper-loginAndRegister {
+    overflow-x: hidden;
+    padding: 20px;
+}

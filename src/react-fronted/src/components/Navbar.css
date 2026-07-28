@@ -1,0 +1,118 @@
+.custom-search-group input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.custom-search-group:focus-within {
+  box-shadow: 0 0 0 2px #ffffff !important;
+  border-radius: 20px;
+  transition: box-shadow 0.15s ease-in-out; 
+}
+
+
+input[type="number"]::-webkit-outer-spin-button,        
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Blurred Backdrop */
+.search-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(10, 12, 23, 0.6); /* Wolt-style dark tint */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1040;
+}
+
+/* Ensure the search bar container stacks on top of the backdrop */
+.custom-search-container {
+  position: relative;
+  z-index: 1050;
+  width: 100%;
+}
+
+/* Search Results Dropdown */
+.search-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 8px;
+  background-color: #161929; /* Match bg-wolt-secondary */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1050;
+  padding: 10px 0;
+  direction: ltr; /* Ensure search layout is LTR */
+}
+
+.search-dropdown-loading {
+  padding: 15px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.search-dropdown-section {
+  padding: 5px 0;
+}
+
+.search-dropdown-section:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.search-dropdown-section-title {
+  padding: 8px 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.search-dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.search-dropdown-item:hover {
+  background-color: #292E45;
+}
+
+.search-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.search-item-desc {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.search-dropdown-empty {
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  text-align: left;
+}

@@ -1,0 +1,15 @@
+# CMake build files and directories
+build/
+
+# VS Code specific files (optional but recommended)
+.vscode/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# data files
+data/dataBase.txt
+
+# node modules in web_js_server
+src/web_js_server/node_modules/

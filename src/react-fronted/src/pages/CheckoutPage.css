@@ -1,0 +1,248 @@
+.wolt-checkout-page {
+    background-color: var(--wolt-primary-bg) !important;
+    color: var(--wolt-text-primary) !important;
+    min-height: 100vh;
+    padding-bottom: 60px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.wolt-checkout-hero {
+    background-image: linear-gradient(rgba(10, 17, 24, 0.8), var(--wolt-checkout-gradient-end)), url('https://images.unsplash.com/photo-1524824267900-2fa9cbf7a506?auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 60px 0;
+    text-align: left;
+}
+
+.wolt-checkout-hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: white !important; /* Keep hero title white since it is on a dark image background */
+}
+
+.wolt-checkout-hero p {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8) !important; /* Keep hero description text readable */
+}
+
+.wolt-checkout-main {
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+}
+
+.wolt-checkout-section {
+    margin-bottom: 32px;
+}
+
+.wolt-checkout-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.wolt-checkout-card {
+    background-color: var(--wolt-secondary-bg) !important;
+    border: 1px solid var(--wolt-muted-border) !important;
+    border-radius: 16px;
+    padding: 24px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Delivery Tab (Mocked as static) */
+.wolt-delivery-tab {
+    background-color: var(--wolt-disabled-bg) !important;
+    border-radius: 24px;
+    padding: 12px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--wolt-text-primary) !important;
+}
+
+.wolt-address-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--wolt-muted-border) !important;
+}
+
+.wolt-address-row:last-child {
+    border-bottom: none;
+}
+
+/* Tip Section */
+.wolt-tip-description {
+    color: var(--wolt-text-secondary) !important;
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.wolt-tip-selector {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.wolt-tip-pill {
+    background-color: transparent;
+    border: 1px solid var(--wolt-muted-border) !important;
+    border-radius: 24px;
+    color: var(--wolt-text-primary) !important;
+    padding: 8px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.wolt-tip-pill:hover {
+    background-color: var(--wolt-disabled-bg) !important;
+}
+
+.wolt-tip-pill.active {
+    border-color: #00c2e8 !important;
+    background-color: rgba(0, 194, 232, 0.1) !important;
+    color: #00c2e8 !important;
+}
+
+.wolt-tip-display {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-right: auto;
+}
+
+/* Custom Tip Bar */
+.wolt-custom-tip-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #00c2e8;
+    border-radius: 12px;
+    padding: 8px 16px;
+    background-color: transparent;
+    margin-top: 16px;
+}
+
+.wolt-custom-tip-btn {
+    background: transparent;
+    border: none;
+    color: #00c2e8;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.wolt-custom-tip-btn:hover {
+    background-color: rgba(0, 194, 232, 0.1);
+}
+
+.wolt-custom-tip-input-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.wolt-custom-tip-input {
+    background: transparent;
+    border: none;
+    color: var(--wolt-text-primary) !important;
+    text-align: right;
+    width: 60px;
+    font-weight: bold;
+    outline: none;
+}
+
+/* Sticky Summary Panel */
+.wolt-summary-panel {
+    background-color: var(--wolt-secondary-bg) !important;
+    border: 1px solid var(--wolt-muted-border) !important;
+    border-radius: 16px;
+    padding: 32px 24px;
+    position: sticky;
+    top: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.wolt-summary-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.wolt-summary-link {
+    color: #00c2e8;
+    text-align: center;
+    display: block;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.wolt-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: var(--wolt-text-secondary) !important;
+    font-size: 0.95rem;
+}
+
+.wolt-summary-row .value {
+    color: var(--wolt-text-primary) !important;
+}
+
+.wolt-summary-divider {
+    height: 1px;
+    background-color: var(--wolt-muted-border) !important;
+    margin: 16px 0;
+}
+
+.wolt-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.wolt-summary-tax-note {
+    color: var(--wolt-text-secondary) !important;
+    font-size: 0.8rem;
+    text-align: right;
+    margin-bottom: 24px;
+}
+
+.wolt-place-order-btn {
+    background-color: #00c2e8 !important;
+    border: none !important;
+    border-radius: 24px !important;
+    color: #0a1118 !important;
+    font-weight: 700 !important;
+    padding: 16px 24px !important;
+    width: 100%;
+    font-size: 1.1rem;
+    transition: filter 0.2s !important;
+}
+
+.wolt-place-order-btn:hover {
+    filter: brightness(1.1);
+}

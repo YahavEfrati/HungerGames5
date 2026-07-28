@@ -1,0 +1,84 @@
+/* Constrain the width of the form so it doesn't stretch too far on desktop */
+.login-form-width {
+    max-width: 380px;
+}
+
+/* 
+ * Override Bootstrap's white background and give it a transparent dark look.
+ */
+.login-dark-input {
+    background-color: rgba(255, 255, 255, 0.05) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.15) !important; 
+    color: white !important; /* Text color inside the input */
+    padding: 12px 16px !important;
+    border-radius: 12px !important; 
+    transition: all 0.2s ease-in-out;
+}
+
+/* What happens when the user clicks inside the input (Focus) */
+.login-dark-input:focus {   
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: #009de0 !important; /* Highlight with Wolt blue */
+    box-shadow: 0 0 0 0.2rem rgba(0, 157, 224, 0.25) !important; /* Soft blue glow */
+}
+
+/* Fix for the built-in Bootstrap placeholder text color (make it light gray) */
+.login-dark-input::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Remove the green checkmark and border color when the form is valid */
+.was-validated .login-dark-input:valid {
+    /* Remove the green checkmark icon */
+    background-image: none !important; 
+    /* Keep the regular transparent border instead of turning green */
+    border-color: rgba(255, 255, 255, 0.15) !important; 
+}
+
+.was-validated .login-dark-input:invalid {
+    /* Keep the regular transparent border instead of turning red */
+    border-color: #dc3545 !important; 
+}
+
+.primary-btn {
+    background-color: #5cb8e0 !important;
+    border-color: #009de0 !important;
+    color : #333333 !important;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 10px;  
+}
+
+.primary-btn:hover {
+    background-color: #3f7b95 !important;
+    border-color: #007eb5 !important;
+}
+
+.secondary-btn {
+    background-color: #ffffff !important;
+    border-color: #000000 !important;
+    color : #333333 !important;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 10px;  
+}
+
+.secondary-btn:hover {
+    background-color: #8a8a8a !important;
+    border-color: #e2f6ff !important;
+}
+
+.login-dark-input:-webkit-autofill,
+.login-dark-input:-webkit-autofill:hover, 
+.login-dark-input:-webkit-autofill:focus, 
+.login-dark-input:-webkit-autofill:active {
+    /* Force the text color to remain white */
+    -webkit-text-fill-color: white !important;
+    
+    /* * The Transition Hack:
+     * Browsers ignore background-color overrides for autofill.
+     * Instead, we tell the browser to take 5000 seconds to transition to its default white background.
+     * This effectively keeps your transparent dark background intact forever.
+     */
+    transition: background-color 5000s ease-in-out 0s;
+}

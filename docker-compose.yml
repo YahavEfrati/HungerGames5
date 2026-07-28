@@ -1,0 +1,48 @@
+services:
+
+  cpp-server:
+    build:
+      context: .
+      dockerfile: src/cpp-server/Dockerfile
+    env_file:
+      - config/.env
+    command: server ${CPP_SERVER_PORT:-8080}
+    ports:
+      - "${CPP_SERVER_PORT:-8080}:${CPP_SERVER_PORT:-8080}"
+    volumes:
+      - ./data:/usr/src/HungerGames/data
+
+  
+  web-js-server:
+    build:
+      context: ./src/web_js_server
+      dockerfile: Dockerfile.node
+    ports:
+      - "${NODE_PORT:-3000}:${NODE_PORT:-3000}"
+    env_file:
+      - config/.env
+    depends_on:
+      - cpp-server
+
+  react-frontend:
+    build:
+      context: ./src/react-fronted
+      dockerfile: Dockerfile
+    ports:
+      - "4000:3000"
+    volumes:
+      - ./src/react-fronted:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://localhost:${NODE_PORT:-3000}/api
+    depends_on:
+      - web-js-server
+      - cpp-server
+
+  tests:
+    build: 
+      context: .
+      dockerfile: src/cpp-server/Dockerfile
+    command: tests
+    profiles: ["testing"]

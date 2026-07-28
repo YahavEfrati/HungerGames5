@@ -1,0 +1,153 @@
+/* Specific tweaks for the Register Page */
+
+.register-form-width {
+    width: 100%;
+    max-width: 450px; 
+}
+
+.register-header-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 0 50px; /* Prevent text from overlapping the absolute button */
+}
+
+.back-to-login-btn {
+    background: none;
+    border: none;
+    color: white;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    width: 40px;
+    height: 40px;
+}
+
+.back-to-login-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* File inputs natively have an ugly gray button. This targets the internal button to style it */
+.register-file-input::file-selector-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-inline-end: 12px; /* Space between button and file name */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.register-file-input::file-selector-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* =========================================
+   Avatar Upload Styling
+   ========================================= */
+
+/* The clickable label container */
+.avatar-upload-label {
+    display: block !important;
+    width: 120px !important;
+    height: 120px !important;
+    max-width: 120px !important;
+    max-height: 120px !important;
+    border-radius: 50% !important;
+    border: 2px dashed rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    margin: 0 auto !important; /* Horizontally center */
+    align-self: center !important; /* Avoid stretching in flex layout */
+    flex-shrink: 0 !important; /* Avoid shrinking in flex layout */
+}
+
+/* Hover effect to indicate it's clickable */
+.avatar-upload-label:hover {
+    border-color: #009de0;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* The actual uploaded image */
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ffffff; /* Solid blue border once uploaded */
+}
+
+/* The gray circle before an image is uploaded */
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    position: relative;
+}
+
+/* The SVG user icon */
+.default-user-icon {
+    width: 60px;
+    height: 60px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* The small '+' button on the bottom right */
+.upload-badge {
+    position: absolute;
+    bottom: 0;
+    right: 5px;
+    background-color: #ffffff;
+    color: white;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    border: 3px solid #ffffff; /* Matches the dark background of the page to create a cutout effect */
+    transition: transform 0.2s ease;
+}
+
+.upload-badge{
+    color: #009de0; /* Wolt blue for the plus sign */
+}
+
+.avatar-upload-label:hover .upload-badge {
+    transform: scale(1.1); /* Slightly enlarge the plus sign on hover */
+}
+
+.login-dark-input:-webkit-autofill,
+.login-dark-input:-webkit-autofill:hover, 
+.login-dark-input:-webkit-autofill:focus, 
+.login-dark-input:-webkit-autofill:active {
+    /* Force the text color to remain white */
+    -webkit-text-fill-color: white !important;
+    
+    /* * The Transition Hack:
+     * Browsers ignore background-color overrides for autofill.
+     * Instead, we tell the browser to take 5000 seconds to transition to its default white background.
+     * This effectively keeps your transparent dark background intact forever.
+     */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.login-dark-input[type="number"]::-webkit-outer-spin-button,
+.login-dark-input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}

@@ -1,0 +1,55 @@
+.custom-carousel {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.custom-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Calculation to display exactly 4 cards in LTR flow --- */
+.custom-carousel > div,
+.custom-carousel > .col {
+  flex: 0 0 calc(25% - 0.75rem);
+  width: calc(25% - 0.75rem);
+}
+
+/* --- Navigation Button (Arrow) Settings --- */
+.wolt-btn-container {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--wolt-secondary-bg);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease;
+}
+
+.wolt-btn-container:hover {
+  background-color: var(--wolt-hover-blue);
+}
+
+.wolt-btn-container:active {
+  transform: scale(0.92);
+}
+
+.cbc_IconButton_iconContainer_f04 {
+  z-index: 1;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  position: absolute;
+  inset: 0;
+}
+
+/* --- Disabled Arrow State (Wolt Spec) --- */
+.wolt-btn-disabled {
+  background-color: var(--wolt-disabled-bg) !important;
+  color: rgba(255, 255, 255, 0.2) !important;
+  opacity: 0.4;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}

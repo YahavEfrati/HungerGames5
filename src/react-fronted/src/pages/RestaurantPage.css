@@ -1,0 +1,413 @@
+/* RestaurantPage.css */
+
+.restaurant-page-wrapper {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--wolt-primary-bg) !important;
+    min-height: 100vh;
+    transition: background-color 0.2s ease;
+}
+
+/* Loading & Error States */
+.restaurant-loading-container {
+    min-height: 100vh;
+    background-color: var(--wolt-primary-bg) !important;
+    transition: background-color 0.2s ease;
+}
+.wolt-spinner { color: #00c2e8; width: 3rem; height: 3rem; }
+.wolt-btn-primary { background-color: #00c2e8; border-color: #00c2e8; color: white; font-weight: 600; border-radius: 8px; }
+.wolt-btn-primary:hover { background-color: #00a8ca; color: white; }
+
+/* 1. Hero Section */
+.wolt-hero-section {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    background-color: #000;
+}
+.wolt-back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    background-color: white;
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    color: #00c2e8;
+}
+.wolt-back-button:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+}
+.wolt-back-icon {
+    width: 24px;
+    height: 24px;
+}
+.wolt-hero-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center 30%;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+}
+.wolt-hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 40%, rgba(0, 0, 0, 0) 100%);
+}
+.wolt-hero-content-wrapper {
+    position: relative;
+    z-index: 2;
+    padding: 0 40px 30px 40px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 30px;
+}
+.wolt-hero-text-container {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    flex: 1;
+}
+.wolt-hero-logo {
+    background-color: white;
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.wolt-hero-logo-text {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #000;
+    margin: 0;
+}
+.wolt-hero-title {
+    color: white;
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    letter-spacing: -1px;
+}
+.wolt-hero-subtitle {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin: 0;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.4);
+}
+
+/* 2. Information Toolbar */
+.wolt-info-bar {
+    background-color: var(--wolt-secondary-bg);
+    border-bottom: 1px solid var(--wolt-muted-border);
+    color: var(--wolt-text-primary);
+    padding: 20px 40px;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.wolt-info-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.wolt-info-left {
+    display: flex;
+    flex-direction: column;
+}
+.wolt-info-times {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    background-color: var(--wolt-muted-border);
+    border-radius: 20px;
+    padding: 4px;
+}
+.wolt-time-pill {
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+.delivery-pill {
+    background-color: var(--wolt-disabled-bg);
+    color: var(--wolt-text-primary);
+}
+.wolt-info-stats {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--wolt-text-secondary);
+    gap: 10px;
+}
+.wolt-stat-separator {
+    font-size: 0.8rem;
+    color: var(--wolt-muted-border);
+}
+.wolt-rating-icon {
+    margin-right: 4px;
+    font-size: 1rem;
+}
+.text-cyan {
+    color: #00c2e8 !important;
+}
+.wolt-more-info-link {
+    font-size: 0.9rem;
+    color: #00c2e8;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+/* 3. Search & Navigation Bar */
+.wolt-nav-bar {
+    background-color: var(--wolt-primary-bg);
+    padding: 0;
+    border-bottom: 1px solid var(--wolt-muted-border);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.wolt-nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 12px 40px;
+}
+
+/* Action Buttons */
+.wolt-info-actions {
+    display: flex;
+    align-items: center;
+}
+.wolt-action-btn {
+    border: 1px solid var(--wolt-muted-border) !important;
+    background-color: var(--wolt-secondary-bg) !important;
+    color: var(--wolt-text-primary) !important;
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s !important;
+}
+.wolt-action-btn:hover {
+    background-color: var(--wolt-disabled-bg) !important;
+}
+.wolt-heart-btn {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 1.2rem;
+}
+.wolt-search-wrapper {
+    position: relative;
+}
+.wolt-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: var(--wolt-text-secondary);
+}
+.wolt-search-input {
+    background-color: var(--wolt-disabled-bg);
+    border: 1px solid var(--wolt-muted-border);
+    border-radius: 20px;
+    padding: 10px 16px 10px 36px;
+    color: var(--wolt-text-primary);
+    font-size: 0.95rem;
+    width: 280px;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+.wolt-search-input::placeholder {
+    color: var(--wolt-text-secondary);
+}
+.wolt-search-input:focus {
+    outline: none;
+    background-color: var(--wolt-disabled-bg);
+    border-color: #00c2e8;
+}
+.wolt-categories {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 4px;
+}
+.wolt-category-item {
+    background: none;
+    border: none;
+    color: var(--wolt-text-primary);
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+    padding-bottom: 6px;
+    border-bottom: 2px solid transparent;
+}
+.wolt-category-item:hover {
+    opacity: 1;
+    color: #00c2e8;
+}
+.wolt-category-item.active {
+    opacity: 1;
+    color: #00c2e8;
+    border-bottom-color: #00c2e8;
+}
+
+/* 4. Page Content */
+.wolt-main-content {
+    background-color: var(--wolt-primary-bg);
+    min-height: 500px;
+    transition: background-color 0.2s ease;
+}
+
+/* 5. Product Cards */
+.wolt-product-card {
+    border: 1px solid var(--wolt-muted-border) !important;
+    border-radius: 12px;
+    background-color: var(--wolt-secondary-bg) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+.wolt-product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+.wolt-product-content {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    min-height: 140px;
+}
+.wolt-product-text-area {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+.wolt-product-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--wolt-text-primary) !important;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+.wolt-product-desc {
+    font-size: 0.9rem;
+    color: var(--wolt-text-secondary) !important;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.wolt-product-price {
+    margin-top: auto;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #00c2e8;
+}
+.wolt-product-image-container {
+    width: 150px;
+    flex-shrink: 0;
+    padding: 16px;
+}
+.wolt-product-img, .wolt-product-img-placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    background-color: var(--wolt-disabled-bg) !important;
+}
+.placeholder-icon {
+    font-size: 2.5rem;
+}
+
+/* Responsive Overrides */
+@media (max-width: 992px) {
+    .wolt-info-bar-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .wolt-hero-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* 6. Added Wolt exact UI styling overrides */
+
+.wolt-delivery-badge {
+    background-color: #ffffff !important;
+    color: #202125 !important;
+    font-weight: 600;
+}
+
+.wolt-menu-filters {
+    border-bottom: 1px solid var(--wolt-muted-border);
+}
+.wolt-filters-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.wolt-filters-scroll::-webkit-scrollbar {
+    display: none;
+}
+.wolt-filter-pill {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--wolt-text-secondary);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+}
+.wolt-filter-pill:hover {
+    color: var(--wolt-text-primary);
+}
+.wolt-filter-pill.active {
+    color: #00c2e8;
+    border-bottom-color: #00c2e8;
+}
+
+.wolt-add-product-btn {
+    background-color: #00c2e8;
+    border-color: #00c2e8;
+    transition: background-color 0.2s, transform 0.2s;
+}
+.wolt-add-product-btn:hover {
+    background-color: #00a8ca;
+    border-color: #00a8ca;
+    transform: scale(1.02);
+}

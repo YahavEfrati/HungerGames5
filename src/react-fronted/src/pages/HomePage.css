@@ -1,0 +1,84 @@
+/* HomePage CSS: Theme adaptation overrides for Light Mode */
+
+[data-theme="light"] .categories-carousel-container {
+  background-color: var(--wolt-secondary-bg) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--wolt-muted-border);
+}
+
+[data-theme="light"] .categories-header-row h2 {
+  color: var(--wolt-text-primary) !important;
+}
+
+[data-theme="light"] .category-card-name {
+  color: var(--wolt-text-primary) !important;
+}
+
+[data-theme="light"] .wolt-arrow-btn {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: var(--wolt-hover-blue) !important;
+}
+
+[data-theme="light"] .wolt-arrow-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-theme="light"] .wolt-arrow-btn:disabled {
+  color: rgba(0, 0, 0, 0.15) !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Restaurant Carousel Adaptation */
+[data-theme="light"] .container.mt-5.pt-5 h1.text-white {
+  color: var(--wolt-text-primary) !important;
+}
+
+[data-theme="light"] .wolt-btn-container {
+  background-color: var(--wolt-secondary-bg) !important;
+  color: var(--wolt-text-primary) !important;
+  border: 1px solid var(--wolt-muted-border) !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .wolt-btn-container:hover {
+  background-color: var(--wolt-hover-blue) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .wolt-btn-disabled {
+  background-color: var(--wolt-disabled-bg) !important;
+  color: rgba(0, 0, 0, 0.25) !important;
+  border-color: var(--wolt-muted-border) !important;
+}
+
+/* Restaurant Card Adaptation */
+[data-theme="light"] .custom-card .bg-wolt-secondary {
+  background-color: var(--wolt-card-bg) !important;
+  border: 1px solid var(--wolt-muted-border) !important;
+  border-top: none !important;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+[data-theme="light"] .custom-card .card-title.text-white {
+  color: var(--wolt-text-primary) !important;
+}
+
+[data-theme="light"] .custom-card .card-text {
+  color: var(--wolt-text-secondary) !important;
+  opacity: 0.9 !important;
+}
+
+[data-theme="light"] .custom-card .border-top.border-secondary {
+  border-top: 1px solid var(--wolt-muted-border) !important;
+}
+
+[data-theme="light"] .custom-card span.text-white {
+  color: var(--wolt-text-primary) !important;
+}
+
+/* Distance badge in card */
+[data-theme="light"] .custom-card .d-flex.flex-column.align-items-center.justify-content-center.rounded-3.fw-bold {
+  background-color: var(--wolt-disabled-bg) !important;
+  color: var(--wolt-text-primary) !important;
+}
