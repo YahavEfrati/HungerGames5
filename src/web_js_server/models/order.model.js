@@ -1,46 +1,62 @@
-class OrderModel {
-    constructor() {
-        /**
-         * Internal Map to store all orders.
-         * Key: Order ID (UUID)
-         * Value: Order Object
-         */
-        this.orders = new Map();
-    }
+const mongoose = require('mongoose');
 
-    /**
-     * Saves a new order to the internal Map.
-     * @param {*} orderData - The verified data for the new order, including generated UUID.
-     */
-    saveOrder(orderData) {
-        this.orders.set(orderData.id, orderData);
-    }
+const orderSchema = new mongoose.Schema(
+    {
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+        restaurantId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Restaurant',
+            required: true,
+        },
 
-    /**
-     * Retrieves an order by its unique ID.
-     * @param {*} id - The unique ID of the order to find.
-     * @returns {Object} The order object if found, otherwise undefined.
-     */
-    findOrderById(id) {
-        return this.orders.get(id);
-    }
+        items: [
+            {
+                productId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Product',
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                    min: 1,
+                    default: 1,
+                },
+                _id: false,
+            },
+        ],
 
-    /**
-     * Retrieves all orders stored in the internal Map.
-     * @returns {Array} An array of all order objects.
-     */
-    findAllOrders() {
-        return Array.from(this.orders.values());
+        totalPrice: {
+            type: Number,
+            required: true,
+            min: 0,
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'active', 'completed', 'cancelled'],
+            default: 'pending',
+        },
+        tip: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        addressX: {
+            type: Number,
+            required: true,
+        },
+        addressY: {
+            type: Number,
+            required: true,
+        },
+    },
+    {
+        timestamps: true,
     }
+);
 
-    /**
-     * Deletes an order by its unique ID.
-     * @param {*} id - The unique ID of the order to delete.
-     */
-    deleteOrder(id) {
-        this.orders.delete(id);
-    }
-    
-}
-
-module.exports = new OrderModel()
+module.exports = mongoose.model('Order', orderSchema);
