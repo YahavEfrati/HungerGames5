@@ -1,5 +1,14 @@
 services:
 
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  
+
   cpp-server:
     build:
       context: .
@@ -23,6 +32,7 @@ services:
       - config/.env
     depends_on:
       - cpp-server
+      - mongodb
 
   react-frontend:
     build:
@@ -46,3 +56,6 @@ services:
       dockerfile: src/cpp-server/Dockerfile
     command: tests
     profiles: ["testing"]
+
+  volumes:  
+    mongo_data:

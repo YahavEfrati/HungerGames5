@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
+const mongoose = require('mongoose');
+
 const restaurantRoutes = require('./routes/restaurant.routes'); 
 const userRoutes = require('./routes/user.routes');
 const searchRoutes = require('./routes/search.routes');
@@ -11,15 +12,20 @@ const restaurantModel = require('./models/restaurant.model');
 const productModel = require('./models/product.model');
 const categoryRoutes = require('./routes/category.routes');
 
+
+const app = express();
+
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 app.use('/api/users', userRoutes);
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/tokens', tokenRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/categories', categoryRoutes);
+
 
 
 // Catch-all middleware for handling undefined routes (404 Not Found).
@@ -40,9 +46,13 @@ app.use((err, req, res, next) => {
 
 // Define the port, allowing for environment variables (maybe useful for deployment)
 const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb:27017/hungergames';
 
-// Connect to the TCP server before starting the HTTP server
-app.listen(PORT, () => {
+mongoose.connect(MONGO_URI).then(async () => {
+    // Seed initial categories into the database
+    await seedCategories();
+    // Connect to the TCP server before starting the HTTP server
+    app.listen(PORT, () => {
     console.log(`[HTTP] Server is running on port ${PORT}`);
 
     tcpClient.connect()
@@ -52,4 +62,5 @@ app.listen(PORT, () => {
         .catch((err) => {
             console.error('[TCP] Failed to connect on startup:', err.message);
         });
+    });
 });
