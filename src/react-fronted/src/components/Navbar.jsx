@@ -4,6 +4,7 @@ import { Modal, Form, Button, Dropdown } from 'react-bootstrap';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import GlobalCartDrawer from './GlobalCartDrawer';
+import { getEntityId } from '../utils/idUtils';
 import './Navbar.css';
 
 /**
@@ -252,18 +253,21 @@ function Navbar() {
                   <div className="search-dropdown-section">
                     <div className="search-dropdown-section-title" style={{ color: 'var(--text-secondary)' }}>Restaurants</div>
                     {searchResults.restaurants.length > 0 ? (
-                      searchResults.restaurants.slice(0, 5).map((restaurant) => (
+                      searchResults.restaurants.slice(0, 5).map((restaurant) => {
+                        const restaurantId = getEntityId(restaurant);
+                        return (
                         <div 
-                          key={restaurant.id} 
+                          key={restaurantId} 
                           className="search-dropdown-item"
-                          onClick={() => handleItemClick(`/restaurant/${restaurant.id}`)}
+                          onClick={() => handleItemClick(`/restaurant/${restaurantId}`)}
                         >
                           <div className="search-item-info">
                             <div className="search-item-name" style={{ color: 'var(--text-primary)' }}>{restaurant.name}</div>
                             <div className="search-item-desc" style={{ color: 'var(--text-secondary)' }}>{restaurant.description}</div>
                           </div>
                         </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="search-dropdown-empty" style={{ color: 'var(--text-secondary)' }}>No matching restaurants</div>
                     )}
@@ -273,9 +277,11 @@ function Navbar() {
                   <div className="search-dropdown-section">
                     <div className="search-dropdown-section-title" style={{ color: 'var(--text-secondary)' }}>Dishes & Products</div>
                     {searchResults.products.length > 0 ? (
-                      searchResults.products.slice(0, 5).map((product) => (
+                      searchResults.products.slice(0, 5).map((product) => {
+                        const productId = getEntityId(product);
+                        return (
                         <div 
-                          key={product.id} 
+                          key={productId} 
                           className="search-dropdown-item"
                           onClick={() => handleItemClick(`/restaurant/${product.restaurantId}`)}
                         >
@@ -286,7 +292,8 @@ function Navbar() {
                             </div>
                           </div>
                         </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="search-dropdown-empty" style={{ color: 'var(--text-secondary)' }}>No matching products</div>
                     )}

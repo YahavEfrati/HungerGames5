@@ -5,6 +5,7 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { getRestaurantById } from '../services/restaurantService';
 import { getOrders } from '../services/orderService';
+import { getEntityId } from '../utils/idUtils';
 import '../styles/WoltTheme.css';
 import './Cart.css';
 
@@ -254,7 +255,7 @@ const GlobalCartDrawer = ({ show, onHide }) => {
                                     const dateStr = new Date(order.createdAt).toLocaleDateString();
 
                                     return (
-                                        <div key={order.id} className="global-cart-card" onClick={() => {
+                                        <div key={getEntityId(order)} className="global-cart-card" onClick={() => {
                                             onHide();
                                             navigate('/past-orders');
                                         }} style={{ cursor: 'pointer' }}>

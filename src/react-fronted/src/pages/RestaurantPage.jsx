@@ -9,6 +9,7 @@ import EditRestaurantModal from '../components/EditRestaurantModal';
 import CartButton from '../components/CartButton';
 import CartDrawer from '../components/CartDrawer';
 import ProductCard from '../components/ProductCard';
+import { getEntityId, sameEntityId } from '../utils/idUtils';
 import './RestaurantPage.css';
 
 const RestaurantPage = () => {
@@ -27,6 +28,8 @@ const RestaurantPage = () => {
     const [showAddProductModal, setShowAddProductModal] = useState(false);
     const [showEditRestaurantModal, setShowEditRestaurantModal] = useState(false);
     const [showCartDrawer, setShowCartDrawer] = useState(false);
+    const currentUserId = getEntityId(currentUser);
+    const restaurantId = getEntityId(restaurant);
 
     const fetchRestaurantData = async () => {
         try {
@@ -98,7 +101,7 @@ const RestaurantPage = () => {
             {/* Styled Banner Area */}
             <div className="wolt-hero-section">
                 <div className="wolt-hero-image" style={{ backgroundImage: `url('${displayImage}')` }}>
-                    {currentUser?.role === 'restaurant_owner' && currentUser?.id === restaurant.ownerId && (
+                    {currentUser?.role === 'restaurant_owner' && sameEntityId(currentUserId, restaurant.ownerId) && (
                         <div 
                             style={{ 
                                 position: 'absolute', 
@@ -168,7 +171,7 @@ const RestaurantPage = () => {
                         </div>
                         
                         <div className="wolt-info-actions">
-                            {currentUser && currentUser.role === 'restaurant_owner' && currentUser.id === restaurant.ownerId && (
+                            {currentUser && currentUser.role === 'restaurant_owner' && sameEntityId(currentUserId, restaurant.ownerId) && (
                                 <Button 
                                     variant="primary" 
                                     className="wolt-add-product-btn fw-bold rounded-pill px-4 ms-3 shadow-sm"
@@ -237,7 +240,7 @@ const RestaurantPage = () => {
                             return (
                                 <Row className="g-4">
                                     {displayedProducts.map(product => (
-                                    <Col key={product.id} xs={12} md={6}>
+                                    <Col key={getEntityId(product)} xs={12} md={6}>
                                         <ProductCard 
                                             product={product}
                                             onClick={() => handleProductClick(product)}
@@ -257,22 +260,22 @@ const RestaurantPage = () => {
                 show={showProductModal}
                 onHide={() => setShowProductModal(false)}
                 product={selectedProduct}
-                isOwner={currentUser && currentUser.role === 'restaurant_owner' && currentUser.id === restaurant.ownerId}
-                restaurantId={restaurant.id}
+                isOwner={currentUser && currentUser.role === 'restaurant_owner' && sameEntityId(currentUserId, restaurant.ownerId)}
+                restaurantId={restaurantId}
                 onProductUpdate={(action, updatedProduct) => {
                     if (action === 'delete') {
                         setRestaurant(prev => ({
                             ...prev,
-                            products: prev.products.filter(p => p.id !== selectedProduct.id)
+                            products: prev.products.filter(p => !sameEntityId(getEntityId(p), getEntityId(selectedProduct)))
                         }));
                     } else if (action === 'update' && updatedProduct) {
                         setRestaurant(prev => ({
                             ...prev,
-                            products: prev.products.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+                            products: prev.products.map(p => sameEntityId(getEntityId(p), getEntityId(updatedProduct)) ? updatedProduct : p)
                         }));
                     } else {
                         // Fallback to fetch
-                        getRestaurantProducts(restaurant.id)
+                        getRestaurantProducts(restaurantId)
                             .then(prods => setRestaurant(prev => ({...prev, products: prods})))
                             .catch(err => console.error("Error refreshing products:", err));
                     }
@@ -283,14 +286,14 @@ const RestaurantPage = () => {
             <CartDrawer
                 show={showCartDrawer}
                 onHide={() => setShowCartDrawer(false)}
-                restaurantId={restaurant.id}
+                restaurantId={restaurantId}
                 restaurantName={restaurant.name}
             />
 
             <AddProductModal 
                 show={showAddProductModal}
                 onHide={() => setShowAddProductModal(false)}
-                restaurantId={restaurant?.id}
+                restaurantId={restaurantId}
                 onProductAdded={(newProduct) => {
                     if (newProduct) {
                         setRestaurant(prev => {

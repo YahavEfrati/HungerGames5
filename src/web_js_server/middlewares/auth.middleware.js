@@ -23,15 +23,20 @@ const requireAuth = async (req, res, next) => {
     try {
         // decode the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+        const authUserId = decoded._id;
+
+        if (!authUserId) {
+            return res.status(403).json({ error: 'Forbidden: Invalid token payload' });
+        }
         
         // STRICT CHECK: Ensure the user still exists in the Database
-        const userExists = await userService.getUserById(decoded.id);
+        const userExists = await userService.getUserById(authUserId);
         if (!userExists) {
             return res.status(401).json({ error: 'Unauthorized: User no longer exists in database' });
         }
 
         req.user = { 
-            id: decoded.id,
+            _id: authUserId,
             role: decoded.role 
         };
 
@@ -61,14 +66,20 @@ const optionalAuth = async (req, res, next) => {
         try {
             // Attempt to verify the token
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+            const authUserId = decoded._id;
+
+            if (!authUserId) {
+                req.user = null;
+                return next();
+            }
             
             // STRICT CHECK: Ensure the user still exists in the Database
-            const userExists = await userService.getUserById(decoded.id);
+            const userExists = await userService.getUserById(authUserId);
             if (!userExists) {
                 req.user = null;
             } else {
                 req.user = { 
-                    id: decoded.id,
+                    _id: authUserId,
                     role: decoded.role 
                 };
             }
@@ -118,7 +129,8 @@ const requireRestaurantOwnership = async (req, res, next) => {
             return res.status(404).json({ error: 'Restaurant not found' });
         }
 
-        if (restaurant.ownerId.toString() !== req.user.id.toString()) { 
+        const authUserId = req.user._id;
+        if (restaurant.ownerId.toString() !== authUserId.toString()) { 
             return res.status(403).json({ error: 'Forbidden: You do not own this restaurant' });
         }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Spinner, Form } from 'react-bootstrap';
+import { getEntityId, sameEntityId } from '../utils/idUtils';
 
 /**
  * EditOrderModal Sub-component
@@ -52,20 +53,21 @@ function EditOrderModal({ show, onHide, order, resolveProductInfo, onSave, avail
 
     const handleAddProduct = () => {
         if (!selectedProductToAdd) return;
-        const prod = availableProducts.find(p => String(p.id) === String(selectedProductToAdd));
+        const prod = availableProducts.find(p => sameEntityId(getEntityId(p), selectedProductToAdd));
         if (!prod) return;
+        const productId = String(getEntityId(prod));
         
         setEditItems(prev => {
-            const existing = prev.find(item => String(item.productId) === String(prod.id));
+            const existing = prev.find(item => sameEntityId(item.productId, productId));
             if (existing) {
                 return prev.map(item => 
-                    String(item.productId) === String(prod.id) 
+                    sameEntityId(item.productId, productId)
                         ? { ...item, quantity: item.quantity + 1 }
                         : item
                 );
             }
             return [...prev, {
-                productId: String(prod.id),
+                productId,
                 quantity: 1,
                 name: prod.name,
                 price: Number(prod.price)
@@ -99,7 +101,7 @@ function EditOrderModal({ show, onHide, order, resolveProductInfo, onSave, avail
                 }))
             };
 
-            await onSave(order.id, updateData);
+            await onSave(getEntityId(order), updateData);
         } catch (err) {
             setError(err.message || 'Failed to save changes.');
         } finally {
@@ -190,7 +192,7 @@ function EditOrderModal({ show, onHide, order, resolveProductInfo, onSave, avail
                         >
                             <option value="">Select a product to add...</option>
                             {availableProducts.map(p => (
-                                <option key={p.id} value={p.id}>{p.name} - ₪{Number(p.price).toFixed(2)}</option>
+                                <option key={String(getEntityId(p) ?? '')} value={String(getEntityId(p) ?? '')}>{p.name} - ₪{Number(p.price).toFixed(2)}</option>
                             ))}
                         </Form.Select>
                         <Button 

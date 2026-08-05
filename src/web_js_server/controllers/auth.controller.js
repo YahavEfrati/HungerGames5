@@ -12,7 +12,7 @@ class AuthController {
      * @param {Object} req - Express request object.
      * @param {Object} res - Express response object.
      */
-    login(req, res) {
+    async login(req, res) {
         const { username, password } = req.body;
 
         // Ensure both fields are present
@@ -40,6 +40,7 @@ class AuthController {
             // 1. Create the payload (Note: changed user.id to user._id)
             const payload = {
                 id: user._id,
+                _id: user._id,
                 role: user.role
             };
 
@@ -56,6 +57,7 @@ class AuthController {
                 authorization: token,
                 user: {
                     id: user._id,
+                    _id: user._id,
                     name: user.name,
                     role: user.role,
                     addressX: user.addressX,

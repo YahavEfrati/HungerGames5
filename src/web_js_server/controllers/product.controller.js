@@ -61,7 +61,7 @@ class ProductController {
                 return res.status(404).json({ error: 'Restaurant or Product not found' });
             }
 
-            const userId = req.user ? req.user.id : null; 
+            const userId = req.user ? req.user._id : null; 
 
             if (userId) {
                 (async () => {

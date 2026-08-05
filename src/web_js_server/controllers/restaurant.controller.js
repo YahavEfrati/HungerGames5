@@ -15,6 +15,7 @@ class RestaurantController {
      // Handles the creation of a new restaurant.
     async createRestaurant(req, res) {
         const { name, description, addressX, addressY, phone, kosher, working_hours, image, categories } = req.body;
+        const authUserId = req.user._id;
 
         try {
             const newRestaurant = await restaurantService.createRestaurant({
@@ -27,7 +28,7 @@ class RestaurantController {
                 working_hours,
                 categories,
                 image,
-                ownerId: req.user.id
+                ownerId: authUserId
             });
 
             // Return 201 Created with the Location header using _id
@@ -105,7 +106,7 @@ class RestaurantController {
 
             // Calculate estimated delivery time if user is authenticated AND not a restaurant manager
             if (req.user) {
-                const user = await userService.getUserById(req.user.id);
+                const user = await userService.getUserById(req.user._id);
                 if (user && user.role !== 'restaurant_owner' && typeof user.addressX === 'number' && typeof user.addressY === 'number') {
                     const dx = user.addressX - resById.addressX;
                     const dy = user.addressY - resById.addressY;

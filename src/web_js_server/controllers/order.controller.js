@@ -8,7 +8,7 @@ class OrderController {
      * @param {*} res - Express response object.
      */
     async createOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+        const userId = req.user._id; // Extract user ID from the authenticated request
 
         // Validate the request body to ensure it contains the necessary order data
         if (!req.body || !Array.isArray(req.body.items) || req.body.items.length === 0) {
@@ -37,7 +37,7 @@ class OrderController {
      * @param {*} res - Express response object.
      */
     async getOrders(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+        const userId = req.user._id; // Extract user ID from the authenticated request
         
         try {
             const orders = await orderService.getOrdersByUserId(userId)
@@ -55,7 +55,7 @@ class OrderController {
      * @param {*} res - Express response object.
      */
    async getOrderById(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+       const userId = req.user._id; // Extract user ID from the authenticated request
 
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });
@@ -80,7 +80,7 @@ class OrderController {
      * @param {*} res - Express response object.
      */
     async updateOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+        const userId = req.user._id; // Extract user ID from the authenticated request
 
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });
@@ -106,7 +106,7 @@ class OrderController {
      * @param {*} res - Express response object.
      */
     async deleteOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+        const userId = req.user._id; // Extract user ID from the authenticated request
         
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });

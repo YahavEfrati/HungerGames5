@@ -7,6 +7,7 @@ import { getRestaurantById } from '../services/restaurantService';
 import OrderTabControls from '../components/OrderTabControls';
 import OrderRow from '../components/OrderRow';
 import EditOrderModal from '../components/EditOrderModal';
+import { getEntityId, sameEntityId } from '../utils/idUtils';
 import './PastOrdersPage.css';
 
 /**
@@ -163,7 +164,7 @@ function PastOrdersPage() {
     // Zero-tolerance data resolver
     const resolveProductInfo = (restaurantId, productId) => {
         const productsList = productsCache[restaurantId] || [];
-        const found = productsList.find(p => p.id === productId);
+        const found = productsList.find(p => sameEntityId(getEntityId(p), productId));
         return found ? {
             name: found.name,
             price: Number(found.price)
@@ -178,7 +179,7 @@ function PastOrdersPage() {
         try {
             await cancelOrder(orderId);
             addToast('Order cancelled successfully.', 'success');
-            setOrders(prev => prev.filter(o => o.id !== orderId));
+            setOrders(prev => prev.filter(o => !sameEntityId(getEntityId(o), orderId)));
         } catch (err) {
             addToast(err.message || 'Failed to cancel order.', 'error');
         }
@@ -297,11 +298,11 @@ function PastOrdersPage() {
 
                         return (
                             <OrderRow 
-                                key={order.id}
+                                key={getEntityId(order)}
                                 order={order}
                                 restaurant={restaurant}
-                                isExpanded={expandedOrders.has(order.id)}
-                                onToggleExpand={() => toggleOrderExpanded(order.id)}
+                                isExpanded={expandedOrders.has(getEntityId(order))}
+                                onToggleExpand={() => toggleOrderExpanded(getEntityId(order))}
                                 resolveProductInfo={resolveProductInfo}
                                 onEditClick={handleOpenEditModal}
                                 onCancelClick={handleCancelOrder}

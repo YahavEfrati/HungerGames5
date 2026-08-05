@@ -1,5 +1,5 @@
 const restaurantModel = require('../models/restaurant.model');
-const POPULAR_CATEGORIES = require('../models/category.model');
+const { POPULAR_CATEGORIES } = require('../models/category.model');
 
 const validCategoryNames = POPULAR_CATEGORIES.map(c => c.name);
 

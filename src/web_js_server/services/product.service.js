@@ -53,7 +53,7 @@ class ProductService {
      * @returns {Object} The newly created product.
      * @throws Error if validation fails or restaurant not found.
      */
-    createProductForRestaurant(restaurantId, productData){
+    async createProductForRestaurant(restaurantId, productData){
         // Validate product data before creation
         if (!this._validateProductData(productData, false)) {
             throw new Error('Invalid product data: name and price are required');

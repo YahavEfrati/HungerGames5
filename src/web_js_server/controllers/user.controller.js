@@ -52,7 +52,7 @@ class UserController {
      */
     async getUserById(req, res) {
         try {
-            const userIdFromToken = req.user.id;
+            const userIdFromToken = req.user._id;
             const requestedUserId = req.params.id;
 
             // Ensure users can only fetch their own profile
@@ -97,7 +97,7 @@ class UserController {
      * @param {Object} res - Express response object.
      */
     async updateUser(req, res) {
-        const userIdFromToken = req.user.id;
+        const userIdFromToken = req.user._id;
         const requestedUserId = req.params.id;
 
         if (requestedUserId !== userIdFromToken) {

@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import CategoriesCarousel from '../components/CategoriesCarousel';
 import { AuthContext } from '../context/AuthContext';
 import AddRestaurantModal from '../components/AddRestaurantModal';
+import { getEntityId, sameEntityId } from '../utils/idUtils';
 import './HomePage.css';
 
 
@@ -27,6 +28,7 @@ function HomePage() {
   const navigate = useNavigate(); 
   const location = useLocation();
   const { currentLocation, currentUser } = useContext(AuthContext);
+  const currentUserId = getEntityId(currentUser);
 
   const isOwner = currentUser?.role === 'restaurant_owner';
 
@@ -42,7 +44,7 @@ function HomePage() {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000/api'}/categories`);
         const data = await res.json();
-        setCategories(data);
+        setCategories(data.POPULAR_CATEGORIES);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
@@ -88,7 +90,7 @@ function HomePage() {
             }
         });
         const dataAll = await resAll.json();
-        const myRestaurants = dataAll.filter(r => r.ownerId === currentUser.id);
+        const myRestaurants = dataAll.filter(r => sameEntityId(r.ownerId, currentUserId));
         setOwnerRestaurants(myRestaurants);
       } catch (error) {
         console.error(error);
@@ -99,7 +101,7 @@ function HomePage() {
 
     fetchTopRated();
     fetchOwnerRestaurants();
-  }, [isOwner, currentUser?.id]);
+  }, [isOwner, currentUserId]);
 
   // Effect that fetches nearby restaurants - runs and reacts exclusively to location changes
   useEffect(() => {
@@ -203,7 +205,7 @@ function HomePage() {
             ) : ownerRestaurants.length > 0 ? (
                 <div className="row g-4">
                     {ownerRestaurants.map((restaurant) => (
-                        <div className="col-12 col-md-6 col-lg-4" key={`owner-${restaurant.id}`}>
+                      <div className="col-12 col-md-6 col-lg-4" key={`owner-${getEntityId(restaurant)}`}>
                             <RestaurantCard {...restaurant} />
                         </div>
                     ))}
@@ -236,7 +238,7 @@ function HomePage() {
                 <div className="row g-4">
                     {filteredRestaurants.length > 0 ? (
                         filteredRestaurants.map(restaurant => (
-                            <div className="col-12 col-md-6 col-lg-4" key={`filtered-${restaurant.id}`}>
+                          <div className="col-12 col-md-6 col-lg-4" key={`filtered-${getEntityId(restaurant)}`}>
                                 <RestaurantCard {...restaurant} />
                             </div>
                         ))
@@ -258,7 +260,7 @@ function HomePage() {
                   onSeeAllClick={() => navigate('/see-all/near-you')}
                 >
                   {nearYouRestaurants.map((restaurant) => (
-                    <RestaurantCard key={`near-${restaurant.id}`} {...restaurant} />
+                    <RestaurantCard key={`near-${getEntityId(restaurant)}`} {...restaurant} />
                   ))}
                 </RestaurantCarousel>
               )
@@ -271,7 +273,7 @@ function HomePage() {
                 onSeeAllClick={() => navigate('/see-all/top-rated')}
               >
                 {topRatedRestaurants.map((restaurant) => (
-                  <RestaurantCard key={`top-${restaurant.id}`} {...restaurant} />
+                  <RestaurantCard key={`top-${getEntityId(restaurant)}`} {...restaurant} />
                 ))}
               </RestaurantCarousel>
             )}
@@ -284,7 +286,7 @@ function HomePage() {
               >
                 {/* Randomize or just show all in reverse order so new ones appear first */}
                 {[...topRatedRestaurants].reverse().map((restaurant) => (
-                  <RestaurantCard key={`all-${restaurant.id}`} {...restaurant} />
+                  <RestaurantCard key={`all-${getEntityId(restaurant)}`} {...restaurant} />
                 ))}
               </RestaurantCarousel>
             )}

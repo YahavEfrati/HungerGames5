@@ -47,7 +47,7 @@ class SearchService {
                     if (isMatch(product)) {
                         matchingProducts.push({
                             ...product,
-                            restaurantId: rest._id || rest.id,
+                            restaurantId: rest._id,
                             restaurantName: rest.name
                         });
                     }
