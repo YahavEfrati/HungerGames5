@@ -21,7 +21,7 @@ const categorySchema = new mongoose.Schema(
 
 const Category = mongoose.model('Category', categorySchema);
 
-const INITIAL_CATEGORIES = [
+const POPULAR_CATEGORIES = [
     { name: 'Fast Food', icon: '🍔' },
     { name: 'Asian', icon: '🍜' },
     { name: 'Healthy', icon: '🥗' },
@@ -34,8 +34,8 @@ async function seedCategories() {
     const count = await Category.countDocuments();
     // If there are no categories in the database, seed the initial categories.
     if (count === 0) {
-        await Category.insertMany(INITIAL_CATEGORIES);
+        await Category.insertMany(POPULAR_CATEGORIES);
     }
 }
 
-module.exports = {Category, seedCategories,};
+module.exports = {Category, seedCategories, POPULAR_CATEGORIES};

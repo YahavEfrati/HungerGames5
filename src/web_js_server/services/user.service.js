@@ -1,5 +1,4 @@
 const userModel = require('../models/user.model');
-const { v4: uuidv4 } = require('uuid');
 
 /**
  * User Service.
@@ -74,54 +73,59 @@ class UserService {
     
     /**
      * Creates a new user with validation.
-     * @param {Object} userData - The user data (username, password, name, phone, addressX, addressY, picture).
-     * @returns {Object} The newly created user.
-     * @throws {Error} If validation fails.
      */
-    createUser(userData) {
-        // Validate user data before creation (throws if invalid)
+    async createUser(userData) {
         this._validateUserData(userData, false);
 
-        // Generate UUID for the new user
-        const userId = uuidv4();
-        const newUser = userModel.createUser({ id: userId, ...userData });
+        const existingUser = await userModel.findOne({ username: userData.username });
+        if (existingUser) {
+            throw new Error("Username already exists.");
+        }
+
+        const newUser = await userModel.create(userData);
         return newUser;
     }
 
-    getUserById(id) {
-        return userModel.getUserById(id);
+    async getUserById(id) {
+        return await userModel.findById(id);
     }
     
-    getUserByUsername(username) {
-        return userModel.getUserByUsername(username);
+    async getUserByUsername(username) {
+        return await userModel.findOne({ username: username });
     }
     
     // For Login - verify username and password, return user ID if valid, else null
-    verifyCredentials(username, password) {
-        const user = this.getUserByUsername(username);
+    async verifyCredentials(username, password) {
+        const user = await this.getUserByUsername(username);
         if (!user || user.password !== password) {
             return null;
         }
-        return user.id;
+        return user._id.toString(); 
     }
 
-    getUserRole(userId) {
-        const user = this.getUserById(userId);
+    async getUserRole(userId) {
+        const user = await this.getUserById(userId);
         return user ? user.role : null;
     }
 
     /**
      * Updates an existing user's details.
-     * @param {string} id - The UUID of the user.
-     * @param {Object} userData - User details containing fields to update.
-     * @returns {Object|null} The updated user object.
-     * @throws {Error} If validation fails.
      */
-    updateUser(id, userData) {
-        // Validate user data before update.
-        // pass isUpdate = true to only validate provided fields.
+    async updateUser(id, userData) {
+        delete userData.username; // Prevent username changes
         this._validateUserData(userData, true);
-        return userModel.updateUser(id, userData);
+        
+        const updatedUser = await userModel.findByIdAndUpdate(
+            id, 
+            userData, 
+            { new: true, runValidators: true }
+        );
+        
+        if (!updatedUser) {
+            throw new Error("User not found.");
+        }
+        
+        return updatedUser;
     }
 }
 

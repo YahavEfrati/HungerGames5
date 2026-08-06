@@ -11,38 +11,36 @@ class UserController {
      * @param {Object} req - Express request object.
      * @param {Object} res - Express response object.
      */
-    createUser(req, res) {
+    async createUser(req, res) {
         const { username, password, name, phone, addressX, addressY, role, picture } = req.body;
         
-        // Parse coordinates to floats (Service expects numbers)
         const parsedAddressX = parseFloat(addressX);
         const parsedAddressY = parseFloat(addressY);
         
-        // Check if username is already taken
-        const existingUser = userService.getUserByUsername(username);
-        if (existingUser) {
-            return res.status(400).json({ error: "Username already exists" });
-        }
-        
         try {
-            // Create the new user using the service (Validation is completely handled by the service layer)
-            const newUser = userService.createUser({ 
+            // Check if username is already taken (Added await and moved inside try/catch)
+            const existingUser = await userService.getUserByUsername(username);
+            if (existingUser) {
+                return res.status(400).json({ error: "Username already exists" });
+            }
+            
+            // Create the new user using the service
+            const newUser = await userService.createUser({ 
                 username, password, name, phone, 
                 addressX: parsedAddressX, 
                 addressY: parsedAddressY, 
                 role, picture 
             });
             
-            // Return 201 Created with Location header pointing to the new resource and a valid JSON body
+            // Return 201 Created with Location header pointing to the new resource
             return res.status(201)
-                .location(`/api/users/${newUser.id}`)
+                .location(`/api/users/${newUser._id}`)
                 .json({ 
                     message: "User registered successfully", 
-                    id: newUser.id,
+                    id: newUser._id,
                     username: newUser.username 
                 });
         } catch (error) {
-            // Return validation errors thrown by the service
             return res.status(400).json({ error: error.message });
         }
     }
@@ -52,21 +50,25 @@ class UserController {
      * @param {Object} req - Express request object.
      * @param {Object} res - Express response object.
      */
-    getUserById(req, res) {
-        const userIdFromToken = req.user.id;
-        const requestedUserId = req.params.id;
+    async getUserById(req, res) {
+        try {
+            const userIdFromToken = req.user._id;
+            const requestedUserId = req.params.id;
 
-        // Ensure users can only fetch their own profile
-        if( requestedUserId !== userIdFromToken) { 
-            return res.status(403).json({ error: "Forbidden: You can only access your own user data" });
+            // Ensure users can only fetch their own profile
+            if( requestedUserId !== userIdFromToken) { 
+                return res.status(403).json({ error: "Forbidden: You can only access your own user data" });
+            }
+
+            const user = await userService.getUserById(requestedUserId);
+            
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }   
+            return res.status(200).json(user);
+        } catch (error) {
+            return res.status(500).json({ error: "Internal server error" });
         }
-
-        const user = userService.getUserById(requestedUserId);
-        
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }   
-        return res.status(200).json(user);
     }
 
     /**
@@ -74,14 +76,19 @@ class UserController {
      * @param {Object} req - Express request object.
      * @param {Object} res - Express response object.
      */
-    getUserByUsername(req, res) {
-        const username = req.params.username;
-        const user = userService.getUserByUsername(username);
-        
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }   
-        return res.status(200).json(user);
+    async getUserByUsername(req, res) {
+        try {
+            const username = req.params.username;
+
+            const user = await userService.getUserByUsername(username);
+            
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }   
+            return res.status(200).json(user);
+        } catch (error) {
+            return res.status(500).json({ error: "Internal server error" });
+        }
     }
 
     /**
@@ -89,11 +96,10 @@ class UserController {
      * @param {Object} req - Express request object.
      * @param {Object} res - Express response object.
      */
-    updateUser(req, res) {
-        const userIdFromToken = req.user.id;
+    async updateUser(req, res) {
+        const userIdFromToken = req.user._id;
         const requestedUserId = req.params.id;
 
-        // Ensure users can only update their own profile details
         if (requestedUserId !== userIdFromToken) {
             return res.status(403).json({ error: "Forbidden: You can only update your own user data" });
         }
@@ -108,7 +114,8 @@ class UserController {
             if (addressY !== undefined) updateData.addressY = parseFloat(addressY);
             if (picture !== undefined) updateData.picture = picture;
 
-            const updatedUser = userService.updateUser(requestedUserId, updateData);
+            const updatedUser = await userService.updateUser(requestedUserId, updateData);
+            
             if (!updatedUser) {
                 return res.status(404).json({ error: "User not found" });
             }

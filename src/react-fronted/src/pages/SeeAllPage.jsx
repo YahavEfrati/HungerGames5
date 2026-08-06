@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import RestaurantCard from '../components/RestaurantCard';
 import { AuthContext } from '../context/AuthContext';
+import { getEntityId } from '../utils/idUtils';
 
 const SeeAllPage = () => {
     const { type } = useParams();
@@ -89,7 +90,7 @@ const SeeAllPage = () => {
             ) : restaurants.length > 0 ? (
                 <Row className="g-4">
                     {restaurants.map(restaurant => (
-                        <Col key={restaurant.id} xs={12} md={6} lg={4}>
+                        <Col key={getEntityId(restaurant)} xs={12} md={6} lg={4}>
                             <RestaurantCard {...restaurant} />
                         </Col>
                     ))}

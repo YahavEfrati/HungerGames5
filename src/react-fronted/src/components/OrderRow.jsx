@@ -1,4 +1,5 @@
 import React from 'react';
+import { getEntityId } from '../utils/idUtils';
 
 /**
  * OrderRow Sub-component
@@ -116,7 +117,7 @@ function OrderRow({
                                             className="wolt-action-btn btn-wolt-danger"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onCancelClick(order.id);
+                                                onCancelClick(getEntityId(order));
                                             }}
                                         >
                                             ❌ Cancel

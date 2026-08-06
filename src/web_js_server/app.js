@@ -11,7 +11,7 @@ const tcpClient = require('./client/tcpClient');
 const restaurantModel = require('./models/restaurant.model');
 const productModel = require('./models/product.model');
 const categoryRoutes = require('./routes/category.routes');
-
+const { seedCategories } = require('./models/category.model');
 
 const app = express();
 

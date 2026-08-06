@@ -4,6 +4,7 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { updateRestaurantProduct, deleteRestaurantProduct } from '../services/restaurantService';
 import { isEmpty } from '../utils/validationUtils';
+import { getEntityId } from '../utils/idUtils';
 import './ProductModal.css';
 
 const ProductModal = ({ show, onHide, product, isOwner, restaurantId, onProductUpdate }) => {
@@ -28,9 +29,10 @@ const ProductModal = ({ show, onHide, product, isOwner, restaurantId, onProductU
                 try {
                     const token = localStorage.getItem('jwt_token');
                     const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
+                    const productId = getEntityId(product);
                     
                     // Fire-and-forget GET request to trigger backend TCP tracking
-                    await fetch(`${apiUrl}/restaurants/${restaurantId}/products/${product.id}`, {
+                    await fetch(`${apiUrl}/restaurants/${restaurantId}/products/${productId}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -91,7 +93,7 @@ const ProductModal = ({ show, onHide, product, isOwner, restaurantId, onProductU
                 description: editedData.description,
                 image: editedData.image
             };
-            const updatedProduct = await updateRestaurantProduct(restaurantId, product.id, updatedProdPayload);
+            const updatedProduct = await updateRestaurantProduct(restaurantId, getEntityId(product), updatedProdPayload);
             setEditMode(false);
             if (onProductUpdate) {
                 onProductUpdate('update', updatedProduct || { ...product, ...updatedProdPayload });
@@ -107,7 +109,7 @@ const ProductModal = ({ show, onHide, product, isOwner, restaurantId, onProductU
         try {
             setIsDeleting(true);
             setError(null);
-            await deleteRestaurantProduct(restaurantId, product.id);
+            await deleteRestaurantProduct(restaurantId, getEntityId(product));
             onHide();
             if (onProductUpdate) {
                 onProductUpdate('delete');

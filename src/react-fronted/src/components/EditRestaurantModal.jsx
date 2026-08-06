@@ -4,6 +4,7 @@ import { updateRestaurant, deleteRestaurant } from '../services/restaurantServic
 import '../pages/ProductModal.css';
 import RestaurantFormFields from './RestaurantFormFields';
 import { isEmpty } from '../utils/validationUtils';
+import { getEntityId } from '../utils/idUtils';
 
 const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) => {
     const [formData, setFormData] = useState({ 
@@ -91,7 +92,9 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
                 image: formData.image.trim()
             };
 
-            const updatedRest = await updateRestaurant(restaurant.id, updatedRestData);
+            const restaurantId = getEntityId(restaurant);
+
+            const updatedRest = await updateRestaurant(restaurantId, updatedRestData);
             
             onHide();
             if (onRestaurantUpdate) {
@@ -108,7 +111,7 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
         try {
             setIsDeleting(true);
             setError(null);
-            await deleteRestaurant(restaurant.id);
+            await deleteRestaurant(getEntityId(restaurant));
             onHide();
             if (onRestaurantUpdate) {
                 onRestaurantUpdate('delete');

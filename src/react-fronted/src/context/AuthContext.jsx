@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { getEntityId } from '../utils/idUtils';
 
 /**
  * Global Authentication Context.
@@ -40,7 +41,16 @@ export const AuthProvider = ({ children }) => {
             if (token && userInfoStr) {
                 try {
                     const user = JSON.parse(userInfoStr);
-                    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000/api'}/users/${user.id}`, {
+                    const userId = getEntityId(user);
+                    if (!userId) {
+                        localStorage.removeItem('jwt_token');
+                        localStorage.removeItem('user_info');
+                        setCurrentUser(null);
+                        setIsAuthLoading(false);
+                        return;
+                    }
+
+                    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000/api'}/users/${userId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -49,7 +59,11 @@ export const AuthProvider = ({ children }) => {
 
                     if (response.ok) {
                         const verifiedData = await response.json();
-                        setCurrentUser(verifiedData);
+                        setCurrentUser({
+                            ...verifiedData,
+                            id: getEntityId(verifiedData),
+                            _id: getEntityId(verifiedData)
+                        });
                     } else if (response.status === 401 || response.status === 404) {
                         // In-memory DB wiped or token invalid
                         localStorage.removeItem('jwt_token');
@@ -91,15 +105,23 @@ export const AuthProvider = ({ children }) => {
      * @param {Object} userData.user - The lightweight user object.
      */
     const login = (userData) => {
+        const normalizedUser = userData.user
+            ? {
+                ...userData.user,
+                id: getEntityId(userData.user),
+                _id: getEntityId(userData.user)
+            }
+            : null;
+
         localStorage.setItem('jwt_token', userData.authorization);
-        localStorage.setItem('user_info', JSON.stringify(userData.user));
-        setCurrentUser(userData.user);
+        localStorage.setItem('user_info', JSON.stringify(normalizedUser));
+        setCurrentUser(normalizedUser);
         // Unconditionally set the current location to the user's saved coordinates on login.
         // The user can still update their location afterward via the NavBar selector.
-        if (userData.user) {
+        if (normalizedUser) {
             const userLoc = {
-                addressX: userData.user.addressX,
-                addressY: userData.user.addressY
+                addressX: normalizedUser.addressX,
+                addressY: normalizedUser.addressY
             };
             localStorage.setItem('current_location', JSON.stringify(userLoc));
             setCurrentLocationState(userLoc);
@@ -123,8 +145,10 @@ export const AuthProvider = ({ children }) => {
      * @param {Object} updatedUser - The updated user object.
      */
     const updateCurrentUser = (updatedUser) => {
+        const normalizedId = getEntityId(updatedUser);
         const userObj = {
-            id: updatedUser.id,
+            id: normalizedId,
+            _id: normalizedId,
             name: updatedUser.name,
             role: updatedUser.role,
             addressX: updatedUser.addressX,

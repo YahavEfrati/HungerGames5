@@ -1,11 +1,12 @@
 import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import { AuthContext } from './AuthContext';
+import { getEntityId, sameEntityId } from '../utils/idUtils';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
     const { currentUser } = useContext(AuthContext);
-    const userId = currentUser ? currentUser.id : 'guest';
+    const userId = getEntityId(currentUser) || 'guest';
     const cartStorageKey = `wolt_cart_${userId}`;
 
     const prevUserIdRef = useRef('guest');
@@ -23,7 +24,7 @@ export const CartProvider = ({ children }) => {
     // When the user changes (login/logout), reload their specific cart or merge if transitioning from guest
     useEffect(() => {
         const prevUserId = prevUserIdRef.current;
-        const currentUserId = currentUser ? currentUser.id : 'guest';
+        const currentUserId = getEntityId(currentUser) || 'guest';
         
         if (prevUserId === 'guest' && currentUserId !== 'guest') {
             // Transition from guest to authenticated user detected!
@@ -52,7 +53,9 @@ export const CartProvider = ({ children }) => {
                     } else {
                         // Merge items individually
                         guestCarts[restId].forEach(guestItem => {
-                            const existingIndex = userCarts[restId].findIndex(i => i.id === guestItem.id && i.notes === guestItem.notes);
+                            const existingIndex = userCarts[restId].findIndex(i =>
+                                sameEntityId(getEntityId(i), getEntityId(guestItem)) && i.notes === guestItem.notes
+                            );
                             if (existingIndex >= 0) {
                                 userCarts[restId][existingIndex].quantity += guestItem.quantity;
                             } else {
@@ -104,9 +107,17 @@ export const CartProvider = ({ children }) => {
     const addItemToCart = (item, restId) => {
         updateCarts(prev => {
             const currentItems = prev[restId] || [];
+            const itemId = getEntityId(item);
+            const normalizedItem = {
+                ...item,
+                _id: itemId,
+                id: itemId
+            };
             
             // Check if item already exists with exact same notes
-            const existingItemIndex = currentItems.findIndex(i => i.id === item.id && i.notes === item.notes);
+            const existingItemIndex = currentItems.findIndex(i =>
+                sameEntityId(getEntityId(i), itemId) && i.notes === item.notes
+            );
             let newItems;
             if (existingItemIndex >= 0) {
                 newItems = [...currentItems];
@@ -115,7 +126,7 @@ export const CartProvider = ({ children }) => {
                     quantity: newItems[existingItemIndex].quantity + item.quantity
                 };
             } else {
-                newItems = [...currentItems, item];
+                newItems = [...currentItems, normalizedItem];
             }
             
             return {
@@ -128,7 +139,9 @@ export const CartProvider = ({ children }) => {
     const removeItemFromCart = (itemId, notes, restId) => {
         updateCarts(prev => {
             const currentItems = prev[restId] || [];
-            const newItems = currentItems.filter(i => !(i.id === itemId && i.notes === notes));
+            const newItems = currentItems.filter(i =>
+                !(sameEntityId(getEntityId(i), itemId) && i.notes === notes)
+            );
             
             // If the cart is now empty, we can choose to delete the key or leave it as an empty array
             if (newItems.length === 0) {
@@ -152,7 +165,9 @@ export const CartProvider = ({ children }) => {
         updateCarts(prev => {
             const currentItems = prev[restId] || [];
             const newItems = [...currentItems];
-            const itemIndex = newItems.findIndex(i => i.id === itemId && i.notes === notes);
+            const itemIndex = newItems.findIndex(i =>
+                sameEntityId(getEntityId(i), itemId) && i.notes === notes
+            );
             if (itemIndex >= 0) {
                 newItems[itemIndex] = {
                     ...newItems[itemIndex],

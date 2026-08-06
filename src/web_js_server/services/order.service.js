@@ -2,7 +2,6 @@ const orderModel = require('../models/order.model');
 const restaurantModel = require('../models/restaurant.model');
 const productService = require('../services/product.service');
 const userService = require('../services/user.service');
-const { v4: uuidv4 } = require('uuid');
 
 class OrderService {
     constructor() {
@@ -26,71 +25,37 @@ class OrderService {
         const allowedFields = [...requiredFields, ...optionalFields];
 
         if (!isUpdate) {
-            // For creation: validate all required fields are present and properly typed
+            if (typeof data.restaurantId !== 'string' || data.restaurantId.trim() === '') return false;
             
-            // Validate restaurantId
-            if (typeof data.restaurantId !== 'string' || data.restaurantId.trim() === '') {
-                return false;
-            }
-
-            // Validate items array
-            if (!Array.isArray(data.items) || data.items.length === 0) {
-                return false;
-            }
+            if (!Array.isArray(data.items) || data.items.length === 0) return false;
             for (const item of data.items) {
-                if (!item.productId || typeof item.productId !== 'string' || item.productId.trim() === '') {
-                    return false;
-                }
+                if (!item.productId || typeof item.productId !== 'string' || item.productId.trim() === '') return false;
                 const quantity = Number(item.quantity) || 1;
-                if (quantity <= 0 || !Number.isInteger(quantity)) {
-                    return false;
-                }
+                if (quantity <= 0 || !Number.isInteger(quantity)) return false;
             }
 
-            // Validate addressX and addressY (numerical coordinates)
-            if (typeof data.addressX !== 'number' || typeof data.addressY !== 'number') {
-                return false;
-            }
+            if (typeof data.addressX !== 'number' || typeof data.addressY !== 'number') return false;
 
-            // Validate tip if provided (optional)
             if (data.tip !== undefined && data.tip !== null) {
                 const tip = Number(data.tip);
-                if (isNaN(tip) || tip < 0) {
-                    return false;
-                }
+                if (isNaN(tip) || tip < 0) return false;
             }
         } else {
-            // For update: only validate fields that are provided
             for (const field of Object.keys(data)) {
-                if (!allowedFields.includes(field)) {
-                    continue;
-                }
-
-                if (data[field] === null) {
-                    return false;
-                }
+                if (!allowedFields.includes(field)) continue;
+                if (data[field] === null) return false;
 
                 if (field === 'tip') {
                     const tip = Number(data[field]);
-                    if (isNaN(tip) || tip < 0) {
-                        return false;
-                    }
+                    if (isNaN(tip) || tip < 0) return false;
                 } else if (field === 'addressX' || field === 'addressY') {
-                    if (typeof data[field] !== 'number') {
-                        return false;
-                    }
+                    if (typeof data[field] !== 'number') return false;
                 } else if (field === 'items') {
-                    if (!Array.isArray(data[field]) || data[field].length === 0) {
-                        return false;
-                    }
+                    if (!Array.isArray(data[field]) || data[field].length === 0) return false;
                     for (const item of data[field]) {
-                        if (!item.productId || typeof item.productId !== 'string' || item.productId.trim() === '') {
-                            return false;
-                        }
+                        if (!item.productId || typeof item.productId !== 'string' || item.productId.trim() === '') return false;
                         const quantity = Number(item.quantity) || 1;
-                        if (quantity <= 0 || !Number.isInteger(quantity)) {
-                            return false;
-                        }
+                        if (quantity <= 0 || !Number.isInteger(quantity)) return false;
                     }
                 }
             }
@@ -106,36 +71,44 @@ class OrderService {
      * @private
      */
     _startLifecycleTimer(orderId) {
-        // Clear existing timer if any (Debounce)
-        if (this.activeTimers.has(orderId)) {
-            clearTimeout(this.activeTimers.get(orderId));
-            this.activeTimers.delete(orderId);
+        const idStr = orderId.toString(); // Safety for MongoDB ObjectId as Map key
+
+        if (this.activeTimers.has(idStr)) {
+            clearTimeout(this.activeTimers.get(idStr));
+            this.activeTimers.delete(idStr);
         }
 
-        // Phase 1: Pending -> Active (20s)
-        const pendingToActiveTimer = setTimeout(() => {
-            const order = orderModel.findOrderById(orderId);
-            if (order && order.status === 'pending') {
-                order.status = 'active';
-                orderModel.saveOrder(order);
+        const pendingToActiveTimer = setTimeout(async () => {
+            try {
+                const order = await orderModel.findById(idStr);
+                if (order && order.status === 'pending') {
+                    order.status = 'active';
+                    await order.save();
 
-                // Phase 2: Active -> Completed (10s)
-                const activeToCompletedTimer = setTimeout(() => {
-                    const activeOrder = orderModel.findOrderById(orderId);
-                    if (activeOrder && activeOrder.status === 'active') {
-                        activeOrder.status = 'completed';
-                        orderModel.saveOrder(activeOrder);
-                    }
-                    this.activeTimers.delete(orderId);
-                }, 10000); // 10 seconds
+                    const activeToCompletedTimer = setTimeout(async () => {
+                        try {
+                            const activeOrder = await orderModel.findById(idStr);
+                            if (activeOrder && activeOrder.status === 'active') {
+                                activeOrder.status = 'completed';
+                                await activeOrder.save();
+                            }
+                        } catch (err) {
+                            console.error('Timer Error (Active to Completed):', err);
+                        }
+                        this.activeTimers.delete(idStr);
+                    }, 10000); 
 
-                this.activeTimers.set(orderId, activeToCompletedTimer);
-            } else {
-                this.activeTimers.delete(orderId);
+                    this.activeTimers.set(idStr, activeToCompletedTimer);
+                } else {
+                    this.activeTimers.delete(idStr);
+                }
+            } catch (err) {
+                console.error('Timer Error (Pending to Active):', err);
+                this.activeTimers.delete(idStr);
             }
-        }, 20000); // 20 seconds
+        }, 20000); 
 
-        this.activeTimers.set(orderId, pendingToActiveTimer);
+        this.activeTimers.set(idStr, pendingToActiveTimer);
     }
 
     /**
@@ -144,37 +117,32 @@ class OrderService {
      * @param {*} orderData - the data for the order, must include restaurantId, items array, and addressX/addressY, tip is optional
      * @throws Error with appropriate status code in message if validation fails (e.g. missing fields, product not found, product not in restaurant)
      */
-    createOrder(userId, orderData) {
-        // Validate order data before creation
+    async createOrder(userId, orderData) {
         if (!this._validateOrderData(orderData, false)) {
             throw new Error('Invalid order data: restaurantId, items array (with positive integer quantities), and numerical addressX/addressY coordinates are required');
         }
 
-        const totalPrice = this._validateAndCalculateOrder(orderData)
+        const totalPrice = await this._validateAndCalculateOrder(orderData);
         
-        const restaurant = restaurantModel.getRestaurantById(orderData.restaurantId);
+        const restaurant = await restaurantModel.findById(orderData.restaurantId);
         if (restaurant && totalPrice < restaurant.minimumOrder) {
             const error = new Error(`Order total is below the minimum order amount of ₪${restaurant.minimumOrder}`);
             error.statusCode = 400;
             throw error;
         }
 
-        const newOrder = {
-            id: uuidv4(),
+        const newOrder = await orderModel.create({
             userId: userId,
             restaurantId: orderData.restaurantId,
             items: orderData.items,
             totalPrice: totalPrice,
             status: 'pending',
-            createdAt: new Date(),
             tip: orderData.tip || 0,
             addressX: orderData.addressX,
             addressY: orderData.addressY
-        }
-        orderModel.saveOrder(newOrder)
+        });
 
-        // Start automated lifecycle
-        this._startLifecycleTimer(newOrder.id);
+        this._startLifecycleTimer(newOrder._id);
 
         return newOrder;
     }
@@ -185,36 +153,32 @@ class OrderService {
      * @returns totalPrice of the order
      * @throws Error if any product is not found or does not belong to the specified restaurant with appropriate status codes in the error message
      */
-    _validateAndCalculateOrder(orderData) {
-        let totalPrice = 0
+    async _validateAndCalculateOrder(orderData) {
+        let totalPrice = 0;
 
         for (const item of orderData.items) {
-            // Validate that the product exists and belongs to the specified restaurant
-            const realProduct = productService.getProductById(orderData.restaurantId, item.productId)
+            const realProduct = await productService.getProductById(orderData.restaurantId, item.productId);
             if (!realProduct) {
-                const error = new Error('Products or Restaurant not found')
-                error.statusCode = 404
-                throw error
+                const error = new Error('Products or Restaurant not found');
+                error.statusCode = 404;
+                throw error;
             }
-            const price = Number(realProduct.price)
-            // Calculate total price by summing up the price of each item multiplied by its quantity
-            totalPrice += (price * (Number(item.quantity) || 1))
+            const price = Number(realProduct.price);
+            totalPrice += (price * (Number(item.quantity) || 1));
         }
 
-        // Add the parsed tip to the final totalPrice sum
         totalPrice += Number(orderData.tip || 0);
-
-        return totalPrice
+        return totalPrice;
     }
 
-    getOrdersByUserId(userId) {
-        return orderModel.findAllOrders().filter(order => order.userId === userId);
+    async getOrdersByUserId(userId) {
+        return await orderModel.find({ userId: userId });
     }
 
-   getOrderById(orderId, userId) {
-        const order = orderModel.findOrderById(orderId);
+   async getOrderById(orderId, userId) {
+        const order = await orderModel.findOne({ _id: orderId, userId: userId });
         
-        if (!order || order.userId !== userId) {
+        if (!order) {
             const error = new Error('Order not found');
             error.statusCode = 404;
             throw error;
@@ -230,46 +194,37 @@ class OrderService {
      * @param {Object} updateData - The partial data containing fields to update.
      * @throws Error if validation fails.
      */
-    updateOrder(orderId, userId, updateData) {
-        const existingOrder = this.getOrderById(orderId, userId);
-        
-        if (!existingOrder) {
-            return null;
-        }
+    async updateOrder(orderId, userId, updateData) {
+        const existingOrder = await this.getOrderById(orderId, userId);
 
-        // Validate update data before applying changes
         if (!this._validateOrderData(updateData, true)) {
             throw new Error('Invalid order data provided for update');
         }
-
-        const mergedOrder = { ...existingOrder };
 
         const allowedUpdates = ['tip', 'addressX', 'addressY', 'items']; 
 
         allowedUpdates.forEach(field => {
             if (updateData[field] !== undefined) {
-                mergedOrder[field] = updateData[field];
+                existingOrder[field] = updateData[field];
             }
         });
 
-        // Recalculate price if items or tip is modified
         if (updateData.items !== undefined || updateData.tip !== undefined) {
             try {
-                const newTotalPrice = this._validateAndCalculateOrder(mergedOrder);
-                mergedOrder.totalPrice = newTotalPrice;
+                const newTotalPrice = await this._validateAndCalculateOrder(existingOrder);
+                existingOrder.totalPrice = newTotalPrice;
             } catch (error) {
                 throw error; 
             }
         }
 
-        orderModel.saveOrder(mergedOrder);
+        await existingOrder.save();
         
-        // Reset timer if updated while still pending
-        if (mergedOrder.status === 'pending') {
-            this._startLifecycleTimer(mergedOrder.id);
+        if (existingOrder.status === 'pending') {
+            this._startLifecycleTimer(existingOrder._id);
         }
 
-        return mergedOrder;
+        return existingOrder;
     }
 
     /**
@@ -277,16 +232,16 @@ class OrderService {
      * @param {string} orderId - The unique ID of the order.
      * @param {string} userId - The ID of the requesting user.
      */
-    deleteOrder(orderId, userId) {
-        this.getOrderById(orderId, userId);
+    async deleteOrder(orderId, userId) {
+        await this.getOrderById(orderId, userId); // Validates existence and ownership
         
-        // Clean up memory
-        if (this.activeTimers.has(orderId)) {
-            clearTimeout(this.activeTimers.get(orderId));
-            this.activeTimers.delete(orderId);
+        const idStr = orderId.toString();
+        if (this.activeTimers.has(idStr)) {
+            clearTimeout(this.activeTimers.get(idStr));
+            this.activeTimers.delete(idStr);
         }
 
-        orderModel.deleteOrder(orderId);
+        await orderModel.deleteOne({ _id: orderId });
         
         return true;
     }

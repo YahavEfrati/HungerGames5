@@ -4,6 +4,7 @@ import { Offcanvas } from 'react-bootstrap';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import CartItem from './CartItem';
+import { getEntityId } from '../utils/idUtils';
 import './Cart.css';
 
 const CartDrawer = ({ show, onHide, restaurantId, restaurantName }) => {
@@ -43,10 +44,10 @@ const CartDrawer = ({ show, onHide, restaurantId, restaurantName }) => {
                     <div>
                         {cartItems.map((item, idx) => (
                             <CartItem 
-                                key={`${item.id}-${idx}`}
+                                key={`${getEntityId(item)}-${idx}`}
                                 item={item}
-                                onUpdateQuantity={(item, newQty) => updateItemQuantity(item.id, item.notes, newQty, restaurantId)}
-                                onRemove={(item) => removeItemFromCart(item.id, item.notes, restaurantId)}
+                                onUpdateQuantity={(item, newQty) => updateItemQuantity(getEntityId(item), item.notes, newQty, restaurantId)}
+                                onRemove={(item) => removeItemFromCart(getEntityId(item), item.notes, restaurantId)}
                             />
                         ))}
                     </div>

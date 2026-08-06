@@ -1,7 +1,5 @@
 const restaurantModel = require('../models/restaurant.model');
-const productModel = require('../models/product.model');
-const { v4: uuidv4 } = require('uuid');
-const POPULAR_CATEGORIES = require('../models/category.model');
+const { POPULAR_CATEGORIES } = require('../models/category.model');
 
 const validCategoryNames = POPULAR_CATEGORIES.map(c => c.name);
 
@@ -19,61 +17,26 @@ class RestaurantService {
      * @private
      */
     _validateRestaurantData(data, isUpdate = false) {
-        if (!data || typeof data !== 'object') {
-            return false;
-        }
+        if (!data || typeof data !== 'object') return false;
 
         const requiredFields = ['name', 'addressX', 'addressY', 'phone', 'kosher', 'working_hours', 'image', 'ownerId'];
-        const optionalFields = ['description', 'categories'];
-        const allowedFields = [...requiredFields, ...optionalFields];
-
+        
         if (!isUpdate) {
-            for (const field of requiredFields) {
-                if (data[field] === undefined || data[field] === null) {
-                    return false;
-                }
-            }
-        } else {
-            for (const field of Object.keys(data)) {
-                if (!allowedFields.includes(field)) {
-                    return false;
-                }
-                if (data[field] === null) {
-                    return false;
-                }
+            const hasAllFields = requiredFields.every(field => data[field] !== undefined && data[field] !== null);
+            if (!hasAllFields) return false;
+        }
+
+        const stringFields = ['name', 'phone', 'image'];
+        for (const field of stringFields) {
+            if (data[field] !== undefined && (typeof data[field] !== 'string' || data[field].trim() === '')) {
+                return false;
             }
         }
 
-        for (const field of Object.keys(data)) {
-            if (data[field] === undefined) continue;
-            if (field === 'kosher') {
-                if (typeof data[field] !== 'boolean') return false;
-            } 
-            else if (field === 'working_hours') {
-                if (typeof data[field] !== 'string' && typeof data[field] !== 'object') return false;
-            } 
-            else if (['addressX', 'addressY'].includes(field)) {
-                if (typeof data[field] !== 'number') return false;
-            } 
-            else if (['name', 'phone'].includes(field)) {
-                if (typeof data[field] !== 'string' || data[field].trim() === '') return false;
-            } 
-            else if (field === 'description') {
-                if (typeof data[field] !== 'string') return false;
-            }
-            else if (field === 'ownerId') {
-                if (typeof data[field] !== 'string' && typeof data[field] !== 'number') return false;
-                if (typeof data[field] === 'string' && data[field].trim() === '') return false;
-            }
-
-            else if (field === 'categories') {
-                if (!Array.isArray(data[field])) return false;
-                const hasInvalidCategory = data[field].some(cat => typeof cat !== 'string' || !validCategoryNames.includes(cat));
-                if (hasInvalidCategory) return false;
-            }
-            else if (field === 'image') {
-                if (typeof data[field] !== 'string' || data[field].trim() === '') return false;
-            }
+        if (data.categories !== undefined) {
+            if (!Array.isArray(data.categories)) return false;
+            const isValid = data.categories.every(cat => typeof cat === 'string' && validCategoryNames.includes(cat));
+            if (!isValid) return false;
         }
 
         return true;
@@ -85,29 +48,31 @@ class RestaurantService {
      * @returns {Object} The newly created restaurant.
      * @throws Error if validation fails.
      */
-    createRestaurant(restaurantData) {
+    async createRestaurant(restaurantData) {
         // Validate restaurant data before creation
         if (!this._validateRestaurantData(restaurantData, false)) {
             throw new Error('Invalid restaurant data: name, addressX, addressY, phone, kosher, working_hours, image, and ownerId are required and must be valid.');
         }
 
-        // Generate a unique UUID for the new restaurant
-        const id = uuidv4();
-        // Create the new Restaurant object and store it using the Model
-        const newRes = restaurantModel.createRestaurant({id , ...restaurantData});
+        const newRes = await restaurantModel.create(restaurantData);
         return newRes;
     }
         
-    getAllRestaurants() {
-        const restaurantsMap = restaurantModel.getAllRestaurants();
-        // Convert the Map to Array and return it.
-        return Array.from(restaurantsMap.values());
+    async getAllRestaurants() {
+        return await restaurantModel.find({});
     }
-    
-    getRestaurantById(id) {
-		return restaurantModel.getRestaurantById(id);
+
+    async getRestaurantById(id) {
+		return await restaurantModel.findById(id);
 	}
-    
+
+    /**
+     * Retrieves restaurants filtered by category.
+     */
+    async getRestaurantsByCategory(category) {
+        return await restaurantModel.find({ categories: category });
+    }
+
     /**
      * Updates an existing restaurant with validation.
      * @param {string} id - The restaurant ID to update.
@@ -115,42 +80,36 @@ class RestaurantService {
      * @returns {boolean} True if successful, false if restaurant not found.
      * @throws Error if validation fails.
      */
-    updateRestaurant(id, updateData) {
-        const resForUpdate = this.getRestaurantById(id);
-        if (!resForUpdate) {
-            return false;
-        }
-
+    async updateRestaurant(id, updateData) {
         // Validate update data before applying changes
         if (!this._validateRestaurantData(updateData, true)) {
             throw new Error('Invalid restaurant data provided for update');
         }
 
-        // Create a copy of the original restaurant
-        const mergedRestaurant = { ...resForUpdate };
-
         // Define a strict whitelist of fields the user is allowed to modify
         const allowedUpdates = ['name', 'description', 'addressX', 'addressY', 'phone', 'kosher', 'working_hours', 'image', 'categories'];
+        const filteredUpdateData = {};
 
         // Iterate and apply only the permitted and provided fields
         allowedUpdates.forEach(field => {
             if (updateData[field] !== undefined) {
-                mergedRestaurant[field] = updateData[field];
+                filteredUpdateData[field] = updateData[field];
             }
         });
 
-        // Update using Model
-        restaurantModel.updateRestaurant(id, mergedRestaurant);
-        return mergedRestaurant;
+        const updatedRestaurant = await restaurantModel.findByIdAndUpdate(
+            id,
+            filteredUpdateData,
+            { new: true, runValidators: true }
+        );
+
+        return updatedRestaurant || false;
     }
 	
 	
-    deleteRestaurant(id) {
-		if (!this.getRestaurantById(id)) {
-			return false
-		}
-		restaurantModel.deleteRestaurant(id);
-		return true
+    async deleteRestaurant(id) {
+        const deletedRes = await restaurantModel.findByIdAndDelete(id);
+        return !!deletedRes;
 	}
 }
 

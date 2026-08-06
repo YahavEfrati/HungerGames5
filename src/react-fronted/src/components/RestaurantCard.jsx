@@ -6,11 +6,14 @@ import { useNavigate } from 'react-router-dom';
  * Displays individual restaurant overview with image, info text, distance and rating.
  * Includes a smooth hover scaling animation that pops above adjacent container layers.
  */
-function RestaurantCard({ id, name, description, distance, rating, image }) {
+function RestaurantCard({ id, _id, name, description, distance, rating, image }) {
     const navigate = useNavigate();
+    const restaurantId = _id || id;
     
     const handleCardClick = () => {
-        navigate(`/restaurant/${id}`);
+        if (restaurantId) {
+            navigate(`/restaurant/${restaurantId}`);
+        }
     };
 
     return (

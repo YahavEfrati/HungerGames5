@@ -5,6 +5,7 @@ import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { getRestaurantById } from '../services/restaurantService';
 import { createOrder } from '../services/orderService';
+import { getEntityId } from '../utils/idUtils';
 import './CheckoutPage.css';
 
 const CheckoutPage = () => {
@@ -90,7 +91,7 @@ const CheckoutPage = () => {
                 addressX: Number(deliveryX),
                 addressY: Number(deliveryY),
                 items: cartItems.map(item => ({
-                    productId: String(item.id),
+                    productId: String(getEntityId(item)),
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity,

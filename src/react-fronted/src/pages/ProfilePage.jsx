@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import { AuthContext } from '../context/AuthContext';
+import { getEntityId } from '../utils/idUtils';
 import './ProfilePage.css';
 
 /**
@@ -62,8 +63,9 @@ const ProfilePage = () => {
 
         const fetchUserProfile = async () => {
             const token = localStorage.getItem('jwt_token');
+            const userId = getEntityId(currentUser);
             try {
-                const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+                const response = await fetch(`${API_URL}/users/${userId}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -157,7 +159,7 @@ const ProfilePage = () => {
             };
 
             const token = localStorage.getItem('jwt_token');
-            const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+            const response = await fetch(`${API_URL}/users/${getEntityId(currentUser)}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

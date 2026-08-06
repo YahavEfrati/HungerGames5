@@ -11,7 +11,7 @@ const userService = require('../services/user.service');
  * @param {Object} res - The Express response object.
  * @param {Function} next - The next middleware or controller.
  */
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,15 +23,20 @@ const requireAuth = (req, res, next) => {
     try {
         // decode the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+        const authUserId = decoded._id;
+
+        if (!authUserId) {
+            return res.status(403).json({ error: 'Forbidden: Invalid token payload' });
+        }
         
-        // STRICT CHECK: Ensure the user still exists in the in-memory DB
-        const userExists = userService.getUserById(decoded.id);
+        // STRICT CHECK: Ensure the user still exists in the Database
+        const userExists = await userService.getUserById(authUserId);
         if (!userExists) {
             return res.status(401).json({ error: 'Unauthorized: User no longer exists in database' });
         }
 
         req.user = { 
-            id: decoded.id,
+            _id: authUserId,
             role: decoded.role 
         };
 
@@ -51,7 +56,7 @@ const requireAuth = (req, res, next) => {
  * @param {Object} res - The Express response object.
  * @param {Function} next - The next middleware or controller.
  */
-const optionalAuth = (req, res, next) => {
+const optionalAuth = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     // Check if the header exists and is formatted correctly
@@ -61,14 +66,20 @@ const optionalAuth = (req, res, next) => {
         try {
             // Attempt to verify the token
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret');
+            const authUserId = decoded._id;
+
+            if (!authUserId) {
+                req.user = null;
+                return next();
+            }
             
-            // STRICT CHECK: Ensure the user still exists in the in-memory DB
-            const userExists = userService.getUserById(decoded.id);
+            // STRICT CHECK: Ensure the user still exists in the Database
+            const userExists = await userService.getUserById(authUserId);
             if (!userExists) {
                 req.user = null;
             } else {
                 req.user = { 
-                    id: decoded.id,
+                    _id: authUserId,
                     role: decoded.role 
                 };
             }
@@ -105,23 +116,28 @@ const requireRestaurantOwner = (req, res, next) => {
  * Restaurant Ownership Validation Middleware.
  * Ensures that the restaurant_owner actually owns the restaurant they are trying to modify.
  */
-const requireRestaurantOwnership = (req, res, next) => {
-    const restaurantId = req.params.id; // Assuming restaurant ID is in the URL as :id
+const requireRestaurantOwnership = async (req, res, next) => {
+    try {
+        const restaurantId = req.params.id; // Assuming restaurant ID is in the URL as :id
 
-    if (!restaurantId) {
-        return res.status(400).json({ error: 'Bad Request: Missing restaurant ID' });
+        if (!restaurantId) {
+            return res.status(400).json({ error: 'Bad Request: Missing restaurant ID' });
+        }
+
+        const restaurant = await restaurantService.getRestaurantById(restaurantId);
+        if (!restaurant) {
+            return res.status(404).json({ error: 'Restaurant not found' });
+        }
+
+        const authUserId = req.user._id;
+        if (restaurant.ownerId.toString() !== authUserId.toString()) { 
+            return res.status(403).json({ error: 'Forbidden: You do not own this restaurant' });
+        }
+
+        next();
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error validating ownership' });
     }
-
-    const restaurant = restaurantService.getRestaurantById(restaurantId);
-    if (!restaurant) {
-        return res.status(404).json({ error: 'Restaurant not found' });
-    }
-
-    if (restaurant.ownerId !== req.user.id) {
-        return res.status(403).json({ error: 'Forbidden: You do not own this restaurant' });
-    }
-
-    next();
 };
 
 // Export middlewares as an object

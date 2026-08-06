@@ -1,4 +1,3 @@
-const { deleteProduct } = require('../services/product.service');
 const productService = require('../services/product.service');
 const tcpClient = require('../client/tcpClient');
 
@@ -15,35 +14,31 @@ class ProductController {
      */
 
     // --- GET /api/restaurants/:id/products ---
-    getProductsByRestaurant(req, res) {
-        // 1. Extract the restaurant ID from the route parameters.
-        const restaurantId = req.params.id;
-        
-        // 2. Call service to fetch products for the restaurant
-        const products = productService.getProductsByRestaurant(restaurantId);
-        
-        // 3. Return 200 OK with the array of products in JSON format
-        if(products){
-            return res.status(200).json(products);
+    async getProductsByRestaurant(req, res) {
+        try {
+            const restaurantId = req.params.id;
+            const products = await productService.getProductsByRestaurant(restaurantId);
+            
+            if (products) {
+                return res.status(200).json(products);
+            }
+            return res.status(404).json({error: 'Restaurant not found'});
+        } catch (error) {
+            return res.status(500).json({ error: "Internal server error" });
         }
-        
-        return res.status(404).json({error: 'Restaurant not found'});
-
-    
     }
 
     // --- POST /api/restaurants/:id/products ---
-    createProduct(req, res){
+    async createProduct(req, res) {
         const restaurantId = req.params.id;
-
-        const {name, price, description, image } = req.body;
+        const { name, price, description, image } = req.body;
 
         try {
-            const newProduct = productService.createProductForRestaurant(restaurantId, {name, price, description, image});
+            const newProduct = await productService.createProductForRestaurant(restaurantId, { name, price, description, image });
 
-            if(newProduct){
+            if (newProduct) {
                 return res.status(201)
-                          .location(`/api/restaurants/${restaurantId}/products/${newProduct.id}`)
+                          .location(`/api/restaurants/${restaurantId}/products/${newProduct._id}`)
                           .json(newProduct);
             }
 
@@ -57,52 +52,50 @@ class ProductController {
     }
 
     // --- GET /api/restaurants/:id/products/:pId ---
-    getProductById(req, res){
-        const {id: restaurantId, pId: productId} = req.params;
-        const product = productService.getProductById(restaurantId, productId);
+    async getProductById(req, res) {
+        try {
+            const { id: restaurantId, pId: productId } = req.params;
+            const product = await productService.getProductById(restaurantId, productId);
 
-        if(!product){
-            return res.status(404).json({ error: 'Restaurant or Product not found' });
-        }
+            if (!product) {
+                return res.status(404).json({ error: 'Restaurant or Product not found' });
+            }
 
-        const userId = req.user? req.user.id: null; // Extract user ID from the authenticated request
+            const userId = req.user ? req.user._id : null; 
 
-        // Execute background notification only if the user is authenticated
-        if (userId) {
-            (async () => {
-                try {
-                    // Step 1: Attempt to update the existing record using PATCH
-                    const patchPayload = `PATCH ${userId} ${productId}\n`;
-                    const response = await tcpClient.send(patchPayload);
+            if (userId) {
+                (async () => {
+                    try {
+                        const patchPayload = `PATCH ${userId} ${productId}\n`;
+                        const response = await tcpClient.send(patchPayload);
 
-                    // Step 2: Check if the C++ server responded with a 404 status string
-                    if (response && response.includes('404')) {
-                        // Fallback: User does not exist, insert a new record using POST
-                        const postPayload = `POST ${userId} ${productId}\n`;
-                        await tcpClient.send(postPayload);
+                        if (response && response.includes('404')) {
+                            const postPayload = `POST ${userId} ${productId}\n`;
+                            await tcpClient.send(postPayload);
+                        }
+                    } catch (err) {
+                        console.error(`[Analytics Error] Network/TCP failure for product ${productId}:`, err.message);
                     }
-                } catch (err) {
-                    // This catch block handles actual network/socket disconnections, not 404 messages
-                    console.error(`[Analytics Error] Network/TCP failure for product ${productId}:`, err.message);
-                }
-            })().catch(err => {
-                // Catch any unexpected errors in the async function
-                console.error(`[Analytics Error] Unexpected error for product ${productId}:`, err.message);
-            });
-        }else {
-            console.warn('[Analytics Warning] No user ID provided in Authorization header. Skipping analytics reporting.');
-        }
+                })().catch(err => {
+                    console.error(`[Analytics Error] Unexpected error for product ${productId}:`, err.message);
+                });
+            } else {
+                console.warn('[Analytics Warning] No user ID provided in Authorization header. Skipping analytics reporting.');
+            }
 
-        return res.status(200).json(product);
+            return res.status(200).json(product);
+        } catch (error) {
+            return res.status(500).json({ error: "Internal server error" });
+        }
     }
 
     // --- PATCH /api/restaurants/:id/products/:pId ---
-    updateProduct(req, res){
-        const{id: restaurantId, pId: productId} = req.params;
+    async updateProduct(req, res) {
+        const { id: restaurantId, pId: productId } = req.params;
         const updateData = req.body;
 
         try {
-            const updateProduct = productService.updateProduct(restaurantId, productId, updateData);
+            const updateProduct = await productService.updateProduct(restaurantId, productId, updateData);
             
             if (!updateProduct) {
                 return res.status(404).json({ error: 'Restaurant or Product not found' });
@@ -115,14 +108,18 @@ class ProductController {
     }
 
     // --- DELETE /api/restaurants/:id/products/:pId ---
-    deleteProduct(req,res){
-        const {id:restaurantId, pId: productId} = req.params;
-        const success = productService.deleteProduct(restaurantId, productId);
+    async deleteProduct(req, res) {
+        try {
+            const { id: restaurantId, pId: productId } = req.params;
+            const success = await productService.deleteProduct(restaurantId, productId);
 
-        if(!success){
-            return res.status(404).json({ error: 'Restaurant or Product not found' });
+            if (!success) {
+                return res.status(404).json({ error: 'Restaurant or Product not found' });
+            }
+            return res.status(204).send();
+        } catch (error) {
+            return res.status(500).json({ error: "Internal server error" });
         }
-        return res.status(204).send();
     }
 }
 

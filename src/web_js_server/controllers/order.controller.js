@@ -7,8 +7,8 @@ class OrderController {
      * @param {*} req - Express request object.
      * @param {*} res - Express response object.
      */
-    createOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+    async createOrder(req, res) {
+        const userId = req.user._id; // Extract user ID from the authenticated request
 
         // Validate the request body to ensure it contains the necessary order data
         if (!req.body || !Array.isArray(req.body.items) || req.body.items.length === 0) {
@@ -21,12 +21,11 @@ class OrderController {
         }
 
         try {
-            const newOrder = orderService.createOrder(userId, req.body)
-            res.location(`/api/orders/${newOrder.id}`)
+            const newOrder = await orderService.createOrder(userId, req.body)
+            res.location(`/api/orders/${newOrder._id}`)
             return res.status(201).send()
 
         } catch (error) {
-            // If the error thrown by the service has a statusCode property, use it; otherwise, default to 400 Bad Request for validation errors
             const statusCode = error.statusCode || 400
             return res.status(statusCode).json({ error: error.message })
         }
@@ -37,11 +36,11 @@ class OrderController {
      * @param {*} req - Express request object.
      * @param {*} res - Express response object.
      */
-    getOrders(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+    async getOrders(req, res) {
+        const userId = req.user._id; // Extract user ID from the authenticated request
         
         try {
-            const orders = orderService.getOrdersByUserId(userId)
+            const orders = await orderService.getOrdersByUserId(userId)
             return res.status(200).json(orders)
         }
         catch (error) {
@@ -55,8 +54,8 @@ class OrderController {
      * @param {*} req - Express request object.
      * @param {*} res - Express response object.
      */
-   getOrderById(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+   async getOrderById(req, res) {
+       const userId = req.user._id; // Extract user ID from the authenticated request
 
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });
@@ -65,7 +64,7 @@ class OrderController {
         try {
             const orderId = req.params.id;
             
-            const order = orderService.getOrderById(orderId, userId);
+            const order = await orderService.getOrderById(orderId, userId);
             
             return res.status(200).json(order);
 
@@ -80,8 +79,8 @@ class OrderController {
      * @param {*} req - Express request object.
      * @param {*} res - Express response object.
      */
-    updateOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+    async updateOrder(req, res) {
+        const userId = req.user._id; // Extract user ID from the authenticated request
 
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });
@@ -91,7 +90,7 @@ class OrderController {
             const orderId = req.params.id;
             const updateData = req.body; 
 
-            orderService.updateOrder(orderId, userId, updateData);
+            await orderService.updateOrder(orderId, userId, updateData);
 
             return res.status(204).end();
 
@@ -106,8 +105,8 @@ class OrderController {
      * @param {*} req - Express request object.
      * @param {*} res - Express response object.
      */
-    deleteOrder(req, res) {
-        const userId = req.user.id; // Extract user ID from the authenticated request
+    async deleteOrder(req, res) {
+        const userId = req.user._id; // Extract user ID from the authenticated request
         
         if (!userId) {
             return res.status(400).json({ error: "Missing user ID in headers" });
@@ -115,8 +114,7 @@ class OrderController {
 
         try {
             const orderId = req.params.id;
-
-            orderService.deleteOrder(orderId, userId);
+            await orderService.deleteOrder(orderId, userId);
 
             return res.status(204).end();
 

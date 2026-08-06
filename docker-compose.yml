@@ -57,5 +57,5 @@ services:
     command: tests
     profiles: ["testing"]
 
-  volumes:  
-    mongo_data:
+volumes:  
+  mongo_data:
