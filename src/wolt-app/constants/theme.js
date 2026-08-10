@@ -1,59 +1,80 @@
+import React, { createContext, useContext, useState } from 'react';
 import { useColorScheme } from 'react-native';
 
 export const COLORS = {
     dark: {
-        background: '#141414',
-        card: '#1f1f1f',
-        inputBg: '#2a2a2a',
+        background: '#0a0c17',
+        card: '#161929',
+        inputBg: '#292E45',
         inputText: '#ffffff',
-        inputPlaceholder: '#888888',
-        inputBorder: '#383838',
-        inputBorderFocus: '#00c2e8',
+        inputPlaceholder: 'rgba(255, 255, 255, 0.7)',
+        inputBorder: 'rgba(255, 255, 255, 0.15)',
+        inputBorderFocus: '#009de0',
         text: '#ffffff',
-        textSecondary: '#a0a0a0',
-        primary: '#00c2e8', // Wolt cyan
-        primaryHover: '#00a3c4',
+        textSecondary: 'rgba(255, 255, 255, 0.7)',
+        primary: '#009de0',
         primaryText: '#ffffff',
-        secondary: '#333333',
-        secondaryText: '#ffffff',
-        accent: '#ffc107',
+        secondary: '#161929',
+        border: 'rgba(255, 255, 255, 0.15)',
+        disabledBg: '#171924',
         error: '#ff4d4d',
         errorBg: '#3a1e1e',
         success: '#28a745',
         successBg: '#1e3a24',
-        border: '#2e2e2e',
         modalOverlay: 'rgba(0, 0, 0, 0.75)',
         popoverBg: '#242424',
+        accent: '#ffc107',
+        secondaryText: '#ffffff',
     },
     light: {
         background: '#f8f9fa',
         card: '#ffffff',
-        inputBg: '#ffffff',
-        inputText: '#141414',
-        inputPlaceholder: '#777777',
-        inputBorder: '#cccccc',
-        inputBorderFocus: '#00c2e8',
-        text: '#141414',
-        textSecondary: '#666666',
-        primary: '#00c2e8',
-        primaryHover: '#00a3c4',
+        inputBg: '#e4e6eb',
+        inputText: '#1C1F31',
+        inputPlaceholder: '#4b4f56',
+        inputBorder: 'rgba(0, 0, 0, 0.15)',
+        inputBorderFocus: '#009de0',
+        text: '#1C1F31',
+        textSecondary: '#4b4f56',
+        primary: '#009de0',
         primaryText: '#ffffff',
-        secondary: '#e9ecef',
-        secondaryText: '#141414',
-        accent: '#ffc107',
+        secondary: '#ffffff',
+        border: 'rgba(0, 0, 0, 0.15)',
+        disabledBg: '#e4e6eb',
         error: '#d9534f',
         errorBg: '#fdf7f7',
         success: '#28a745',
         successBg: '#f4faf5',
-        border: '#e0e0e0',
         modalOverlay: 'rgba(0, 0, 0, 0.5)',
         popoverBg: '#ffffff',
+        accent: '#ffc107',
+        secondaryText: '#141414',
     }
 };
 
-export const useAppTheme = () => {
-    const colorScheme = useColorScheme();
-    // Default to dark theme as per Wolt theme aesthetic, but dynamically supports light mode
-    const isDark = colorScheme !== 'light';
-    return isDark ? COLORS.dark : COLORS.light;
+const ThemeContext = createContext();
+
+export const ThemeProvider = ({ children }) => {
+    const systemColorScheme = useColorScheme();
+    const [isDarkMode, setIsDarkMode] = useState(systemColorScheme !== 'light');
+
+    const toggleTheme = () => {
+        setIsDarkMode((prevMode) => !prevMode);
+    };
+
+    const colors = isDarkMode ? COLORS.dark : COLORS.light;
+
+    return (
+        <ThemeContext.Provider value={{ isDarkMode, colors, toggleTheme }}>
+            {children}
+        </ThemeContext.Provider>
+    );
+};
+
+export const useTheme = () => {
+    const context = useContext(ThemeContext);
+    if (!context) {
+        throw new Error('useTheme must be used within a ThemeProvider');
+    }
+    return context;
 };
