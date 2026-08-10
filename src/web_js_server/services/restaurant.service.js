@@ -59,18 +59,23 @@ class RestaurantService {
     }
         
     async getAllRestaurants() {
-        return await restaurantModel.find({});
+        return await restaurantModel.find({}).populate('categories');
     }
 
     async getRestaurantById(id) {
-		return await restaurantModel.findById(id);
+		return await restaurantModel.findById(id).populate('categories');
 	}
 
     /**
      * Retrieves restaurants filtered by category.
      */
     async getRestaurantsByCategory(category) {
-        return await restaurantModel.find({ categories: category });
+        // Find the category by name to get its ObjectId
+        const { Category } = require('../models/category.model');
+        const categoryDoc = await Category.findOne({ name: category });
+        if (!categoryDoc) return [];
+        
+        return await restaurantModel.find({ categories: categoryDoc._id }).populate('categories');
     }
 
     /**
@@ -101,7 +106,7 @@ class RestaurantService {
             id,
             filteredUpdateData,
             { new: true, runValidators: true }
-        );
+        ).populate('categories');
 
         return updatedRestaurant || false;
     }

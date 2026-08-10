@@ -2,6 +2,27 @@ const restaurantService = require('../services/restaurant.service');
 const userService = require('../services/user.service');
 
 /**
+ * Helper function to transform a restaurant document into a frontend-friendly DTO.
+ * Strips the 'products' array and maps populated category objects to their string names.
+ * @param {Object} restaurantDoc - The raw Mongoose document.
+ * @returns {Object} The clean DTO.
+ */
+function transformRestaurantDTO(restaurantDoc) {
+    const dto = restaurantDoc.toObject ? restaurantDoc.toObject() : { ...restaurantDoc };
+    
+    // The frontend expects products to be fetched separately, so we remove them
+    delete dto.products;
+
+    // Map populated Category objects (which have a 'name' property) to just their string names.
+    // If it's already a string or a raw ObjectId without a name, we leave it as is to avoid errors.
+    if (dto.categories && Array.isArray(dto.categories)) {
+        dto.categories = dto.categories.map(cat => (cat && cat.name) ? cat.name : cat);
+    }
+    
+    return dto;
+}
+
+/**
  * Restaurant Controller.
  * Handles incoming HTTP requests, validates input, and formats HTTP responses.
  */
@@ -34,7 +55,7 @@ class RestaurantController {
             // Return 201 Created with the Location header using _id
             return res.status(201)
                 .location(`/api/restaurants/${newRestaurant._id}`)
-                .json(newRestaurant);
+                .json(transformRestaurantDTO(newRestaurant));
         } catch (error) {
             return res.status(400).json({ error: error.message });
         }
@@ -47,8 +68,8 @@ class RestaurantController {
         try {
             const restaurants = await restaurantService.getAllRestaurants();
 
-            // Mongoose documents need to be converted to plain JS objects to manipulate them
-            let processedRestaurants = restaurants.map(r => r.toObject ? r.toObject() : { ...r });
+            // Transform all documents to DTOs (which handles category mapping and product removal)
+            let processedRestaurants = restaurants.map(r => transformRestaurantDTO(r));
 
             if (lat && lng) {
                 const userLat = parseFloat(lat);
@@ -84,10 +105,7 @@ class RestaurantController {
                 });
             }
 
-            // Remove the 'products' field from each restaurant object before sending the response
-            const cleanRestaurants = processedRestaurants.map(({ products, ...info }) => info);
-            
-            return res.status(200).json(cleanRestaurants);
+            return res.status(200).json(processedRestaurants);
         } catch (error) {
             return res.status(500).json({ error: "Internal server error" });
         }
@@ -101,8 +119,7 @@ class RestaurantController {
                 return res.status(404).json({ error: "Restaurant not found" });
             }
 
-            const restaurantObj = resById.toObject ? resById.toObject() : { ...resById };
-            const { products, ...restaurantWithoutProducts } = restaurantObj;
+            const cleanRestaurant = transformRestaurantDTO(resById);
 
             // Calculate estimated delivery time if user is authenticated AND not a restaurant manager
             if (req.user) {
@@ -111,11 +128,11 @@ class RestaurantController {
                     const dx = user.addressX - resById.addressX;
                     const dy = user.addressY - resById.addressY;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    restaurantWithoutProducts.estimatedDeliveryTime = Math.ceil(distance * 5) + 15;
+                    cleanRestaurant.estimatedDeliveryTime = Math.ceil(distance * 5) + 15;
                 }
             }
 
-            return res.status(200).json(restaurantWithoutProducts);
+            return res.status(200).json(cleanRestaurant);
         } catch (error) {
             return res.status(500).json({ error: "Internal server error" });
         }
@@ -127,11 +144,7 @@ class RestaurantController {
             const category = req.params.category;
             const restaurants = await restaurantService.getRestaurantsByCategory(category);
 
-            const cleanRestaurants = restaurants.map(restaurant => {
-                const restaurantObj = restaurant.toObject ? restaurant.toObject() : { ...restaurant };
-                const { products, ...restaurantInfo } = restaurantObj;
-                return restaurantInfo;
-            });
+            const cleanRestaurants = restaurants.map(r => transformRestaurantDTO(r));
             return res.status(200).json(cleanRestaurants);
         } catch (error) {
             return res.status(500).json({ error: "Internal server error" });
@@ -149,15 +162,11 @@ class RestaurantController {
                 return res.status(404).json({ error: "Restaurant not found" });
             }
             
-            const restaurantObj = updatedRestaurant.toObject ? updatedRestaurant.toObject() : { ...updatedRestaurant };
-            const { products, ...cleanRestaurant } = restaurantObj;
-
-            return res.status(200).json(cleanRestaurant);
+            return res.status(200).json(transformRestaurantDTO(updatedRestaurant));
         } catch (error) {
             return res.status(400).json({ error: error.message });
         }
     }
-
 
     // Deletes a restaurant by its ID.
     async deleteRestaurant(req, res) {

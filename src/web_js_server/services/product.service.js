@@ -1,4 +1,5 @@
 const restaurantModel = require('../models/restaurant.model');
+const productModel = require('../models/product.model');
 
 /**
  * Product Service.
@@ -64,29 +65,21 @@ class ProductService {
             throw new Error('Restaurant not found');
         }
 
-        // Push the new product to the Mongoose Document Array
-        restaurant.products.push(productData);
-        await restaurant.save();
-
-        // Return the newly created product (the last one in the array)
-        return restaurant.products[restaurant.products.length - 1];
+        // Create the product in the Product collection using productModel
+        productData.restaurantId = restaurantId;
+        const newProduct = await productModel.create(productData);
+        return newProduct;
     }
 
     // GET (all products)
     async getProductsByRestaurant(restaurantId) {
-        const restaurant = await restaurantModel.findById(restaurantId);
-        if (!restaurant || !restaurant.products) return null;
-        
-        return restaurant.products;
+        // Find all products that reference this restaurantId
+        return await productModel.find({ restaurantId: restaurantId });
     }
 
     // GET (specific product)
     async getProductById(restaurantId, productId) {
-        const restaurant = await restaurantModel.findById(restaurantId);
-        if (!restaurant || !restaurant.products) return null;
-        
-        // Use Mongoose's built-in .id() method to find a subdocument
-        return restaurant.products.id(productId);
+        return await productModel.findOne({ _id: productId, restaurantId: restaurantId });
     }
 
     // PATCH
@@ -98,10 +91,7 @@ class ProductService {
      * @returns {Object|null} Updated product or null if not found.
      */
     async updateProduct(restaurantId, productId, updateData) {
-        const restaurant = await restaurantModel.findById(restaurantId);
-        if (!restaurant || !restaurant.products) return null;
-
-        const product = restaurant.products.id(productId);
+        const product = await productModel.findOne({ _id: productId, restaurantId: restaurantId });
         if (!product) return null;
 
         if (updateData.name !== undefined) {
@@ -124,22 +114,14 @@ class ProductService {
             product.image = updateData.image;
         }
 
-        await restaurant.save();
+        await product.save();
         return product;
     }
 
     // DELETE
     async deleteProduct(restaurantId, productId) {
-        const restaurant = await restaurantModel.findById(restaurantId);
-        if (!restaurant || !restaurant.products) return false;
-
-        const product = restaurant.products.id(productId);
-        if (!product) return false;
-
-        // Use Mongoose's pull/deleteOne method to remove the subdocument
-        product.deleteOne();
-        await restaurant.save();
-        return true;
+        const result = await productModel.deleteOne({ _id: productId, restaurantId: restaurantId });
+        return result.deletedCount > 0;
     }
 
 }
