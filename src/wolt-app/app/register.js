@@ -20,7 +20,8 @@ import { getStyles } from '../styles/register.styles';
 
 /**
  * Mobile Registration Screen Component for Wolt App.
- * Enforces client-side validations, native image picking (camera & gallery),
+ * Enforces client-side validations simultaneously across all fields,
+ * displays inline field errors, handles native image picking (camera & gallery),
  * and dispatches POST /api/users request matching backend Mongoose schema.
  */
 export default function RegisterScreen() {
@@ -40,12 +41,27 @@ export default function RegisterScreen() {
     const [pictureUri, setPictureUri] = useState(null);
 
     // UI & Validation States
+    const [errors, setErrors] = useState({});
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [submittingRole, setSubmittingRole] = useState(null);
     const [showPasswordRules, setShowPasswordRules] = useState(false);
     const [showPickerModal, setShowPickerModal] = useState(false);
+
+    /**
+     * Clears validation error for a specific field as soon as user types or modifies it.
+     */
+    const clearFieldError = (field) => {
+        if (errors[field]) {
+            setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+            });
+        }
+        if (error) setError('');
+    };
 
     /**
      * Validates if the password meets complexity criteria:
@@ -90,12 +106,12 @@ export default function RegisterScreen() {
             if (!result.canceled && result.assets && result.assets.length > 0) {
                 const asset = result.assets[0];
                 setPictureUri(asset.uri);
-                
+
                 // Format Base64 string with Data URI scheme
                 const mimeType = asset.mimeType || 'image/jpeg';
                 const formattedBase64 = `data:${mimeType};base64,${asset.base64}`;
                 setPictureBase64(formattedBase64);
-                setError('');
+                clearFieldError('picture');
             }
         } catch (err) {
             Alert.alert('Error', 'Failed to select image from gallery.');
@@ -131,11 +147,63 @@ export default function RegisterScreen() {
                 const mimeType = asset.mimeType || 'image/jpeg';
                 const formattedBase64 = `data:${mimeType};base64,${asset.base64}`;
                 setPictureBase64(formattedBase64);
-                setError('');
+                clearFieldError('picture');
             }
         } catch (err) {
             Alert.alert('Error', 'Failed to take photo with camera.');
         }
+    };
+
+    /**
+     * Validates all form fields simultaneously and returns an errors object.
+     */
+    const validateForm = () => {
+        const newErrors = {};
+
+        if (!pictureBase64) {
+            newErrors.picture = 'Profile picture is required.';
+        }
+
+        if (!username.trim()) {
+            newErrors.username = 'Username is required.';
+        }
+
+        if (!password) {
+            newErrors.password = 'Password is required.';
+        } else if (!isPasswordComplex(password)) {
+            newErrors.password =
+                'Password must be at least 8 characters long and contain uppercase, lowercase letters, and numbers.';
+        }
+
+        if (!verifyPassword) {
+            newErrors.verifyPassword = 'Please verify your password.';
+        } else if (password && verifyPassword !== password) {
+            newErrors.verifyPassword = 'Passwords do not match.';
+        }
+
+        if (!name.trim()) {
+            newErrors.name = 'Full name is required.';
+        }
+
+        if (!phone.trim()) {
+            newErrors.phone = 'Phone number is required.';
+        } else if (!isPhoneValid(phone.trim())) {
+            newErrors.phone = 'Phone number must contain only digits.';
+        }
+
+        if (!addressX.trim()) {
+            newErrors.addressX = 'Latitude is required.';
+        } else if (isNaN(parseFloat(addressX))) {
+            newErrors.addressX = 'Latitude (X) must be a valid number.';
+        }
+
+        if (!addressY.trim()) {
+            newErrors.addressY = 'Longitude is required.';
+        } else if (isNaN(parseFloat(addressY))) {
+            newErrors.addressY = 'Longitude (Y) must be a valid number.';
+        }
+
+        return newErrors;
     };
 
     /**
@@ -145,66 +213,14 @@ export default function RegisterScreen() {
         setError('');
         setSuccess('');
 
-        // 1. Mandatory input checks
-        if (!username.trim()) {
-            setError('Username is required.');
-            return;
-        }
-        if (!password) {
-            setError('Password is required.');
-            return;
-        }
-        if (!verifyPassword) {
-            setError('Please verify your password.');
-            return;
-        }
-        if (!name.trim()) {
-            setError('Full name is required.');
-            return;
-        }
-        if (!phone.trim()) {
-            setError('Phone number is required.');
-            return;
-        }
-        if (!addressX.trim()) {
-            setError('Latitude is required.');
-            return;
-        }
-        if (!addressY.trim()) {
-            setError('Longitude is required.');
+        // Perform simultaneous validation across all fields
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             return;
         }
 
-        // 2. Password complexity validation
-        if (!isPasswordComplex(password)) {
-            setError('Password must be at least 8 characters long and contain uppercase, lowercase letters, and numbers.');
-            return;
-        }
-
-        // 3. Password match validation
-        if (password !== verifyPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
-
-        // 4. Phone digits validation
-        if (!isPhoneValid(phone.trim())) {
-            setError('Phone number must contain only digits.');
-            return;
-        }
-
-        // 5. Latitude / Longitude validity
-        if (isNaN(parseFloat(addressX)) || isNaN(parseFloat(addressY))) {
-            setError('Latitude (X) and Longitude (Y) must be valid numbers.');
-            return;
-        }
-
-        // 6. Profile picture validation
-        if (!pictureBase64) {
-            setError('Please select a profile picture.');
-            return;
-        }
-
+        setErrors({});
         setLoading(true);
         setSubmittingRole(role);
 
@@ -236,6 +252,7 @@ export default function RegisterScreen() {
             setAddressY('');
             setPictureUri(null);
             setPictureBase64(null);
+            setErrors({});
 
             // Alert user and navigate
             Alert.alert(
@@ -273,14 +290,14 @@ export default function RegisterScreen() {
                     <Text style={styles.screenTitle}>Register To HungerGames!</Text>
                 </View>
 
-                {/* Error Banner */}
+                {/* Top Error Banner (for server/network errors) */}
                 {error ? (
                     <View style={[styles.alertBanner, styles.errorBanner]}>
                         <Text style={styles.errorText}>{error}</Text>
                     </View>
                 ) : null}
 
-                {/* Success Banner */}
+                {/* Top Success Banner */}
                 {success ? (
                     <View style={[styles.alertBanner, styles.successBanner]}>
                         <Text style={styles.successText}>{success}</Text>
@@ -291,7 +308,10 @@ export default function RegisterScreen() {
                 <View style={styles.avatarSection}>
                     <Text style={styles.fieldLabel}>Profile Picture *</Text>
                     <TouchableOpacity
-                        style={styles.avatarContainer}
+                        style={[
+                            styles.avatarContainer,
+                            errors.picture ? styles.inputError : null,
+                        ]}
                         onPress={() => setShowPickerModal(true)}
                         activeOpacity={0.8}
                     >
@@ -309,20 +329,32 @@ export default function RegisterScreen() {
                     <Text style={styles.avatarHint}>
                         {pictureUri ? 'Tap to change picture' : 'Tap to select picture'}
                     </Text>
+                    {errors.picture ? (
+                        <Text style={styles.fieldErrorText}>{errors.picture}</Text>
+                    ) : null}
                 </View>
 
                 {/* Form Fields */}
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Username *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.username ? styles.inputError : null,
+                        ]}
                         placeholder="Enter username"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={username}
-                        onChangeText={setUsername}
+                        onChangeText={(text) => {
+                            setUsername(text);
+                            clearFieldError('username');
+                        }}
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
+                    {errors.username ? (
+                        <Text style={styles.fieldErrorText}>{errors.username}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
@@ -348,74 +380,128 @@ export default function RegisterScreen() {
                     )}
 
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.password ? styles.inputError : null,
+                        ]}
                         placeholder="Enter password"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={password}
-                        onChangeText={setPassword}
+                        onChangeText={(text) => {
+                            setPassword(text);
+                            clearFieldError('password');
+                        }}
                         secureTextEntry
                         autoCapitalize="none"
                     />
+                    {errors.password ? (
+                        <Text style={styles.fieldErrorText}>{errors.password}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Verify Password *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.verifyPassword ? styles.inputError : null,
+                        ]}
                         placeholder="Re-enter password"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={verifyPassword}
-                        onChangeText={setVerifyPassword}
+                        onChangeText={(text) => {
+                            setVerifyPassword(text);
+                            clearFieldError('verifyPassword');
+                        }}
                         secureTextEntry
                         autoCapitalize="none"
                     />
+                    {errors.verifyPassword ? (
+                        <Text style={styles.fieldErrorText}>{errors.verifyPassword}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Full Name *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.name ? styles.inputError : null,
+                        ]}
                         placeholder="Enter full name"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={name}
-                        onChangeText={setName}
+                        onChangeText={(text) => {
+                            setName(text);
+                            clearFieldError('name');
+                        }}
                     />
+                    {errors.name ? (
+                        <Text style={styles.fieldErrorText}>{errors.name}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Phone Number *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.phone ? styles.inputError : null,
+                        ]}
                         placeholder="Enter phone number (digits only)"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={phone}
-                        onChangeText={setPhone}
+                        onChangeText={(text) => {
+                            setPhone(text);
+                            clearFieldError('phone');
+                        }}
                         keyboardType="phone-pad"
                     />
+                    {errors.phone ? (
+                        <Text style={styles.fieldErrorText}>{errors.phone}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Address Latitude (X) *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.addressX ? styles.inputError : null,
+                        ]}
                         placeholder="e.g. 32.0853"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={addressX}
-                        onChangeText={setAddressX}
+                        onChangeText={(text) => {
+                            setAddressX(text);
+                            clearFieldError('addressX');
+                        }}
                         keyboardType="numeric"
                     />
+                    {errors.addressX ? (
+                        <Text style={styles.fieldErrorText}>{errors.addressX}</Text>
+                    ) : null}
                 </View>
 
                 <View style={styles.formGroup}>
                     <Text style={styles.fieldLabel}>Address Longitude (Y) *</Text>
                     <TextInput
-                        style={styles.input}
+                        style={[
+                            styles.input,
+                            errors.addressY ? styles.inputError : null,
+                        ]}
                         placeholder="e.g. 34.7818"
                         placeholderTextColor={theme.inputPlaceholder}
                         value={addressY}
-                        onChangeText={setAddressY}
+                        onChangeText={(text) => {
+                            setAddressY(text);
+                            clearFieldError('addressY');
+                        }}
                         keyboardType="numeric"
                     />
+                    {errors.addressY ? (
+                        <Text style={styles.fieldErrorText}>{errors.addressY}</Text>
+                    ) : null}
                 </View>
 
                 {/* Submit Buttons */}
