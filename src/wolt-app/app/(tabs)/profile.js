@@ -8,8 +8,7 @@ export default function ProfileScreen() {
   const { colors, isDarkMode, toggleTheme } = useTheme();
 
   const handleLoginPress = () => {
-    // Navigate to the login route once it's created
-    // router.push('/(auth)/login');
+    router.push('/(auth)/login');
   };
 
   const handleRegisterPress = () => {

@@ -7,7 +7,6 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-  
 
   cpp-server:
     build:
@@ -21,7 +20,6 @@ services:
     volumes:
       - ./data:/usr/src/HungerGames/data
 
-  
   web-js-server:
     build:
       context: ./src/web_js_server
@@ -34,18 +32,22 @@ services:
       - cpp-server
       - mongodb
 
-  react-frontend:
+  wolt-app:
     build:
-      context: ./src/react-fronted
+      context: ./src/wolt-app
       dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
     ports:
-      - "4000:3000"
+      - "8081:8081"
+      - "19000:19000"
+      - "19001:19001"
     volumes:
-      - ./src/react-fronted:/app
+      - ./src/wolt-app:/app
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - REACT_APP_API_URL=http://localhost:${NODE_PORT:-3000}/api
+      - EXPO_PUBLIC_API_URL=http://localhost:${NODE_PORT:-3000}/api
     depends_on:
       - web-js-server
       - cpp-server

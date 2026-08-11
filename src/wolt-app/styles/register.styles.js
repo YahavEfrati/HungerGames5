@@ -169,6 +169,15 @@ export const getStyles = (theme) =>
             color: theme.inputText,
             borderColor: theme.inputBorder,
         },
+        inputError: {
+            borderColor: theme.error,
+        },
+        fieldErrorText: {
+            color: theme.error,
+            fontSize: 12,
+            marginTop: 4,
+            fontWeight: '500',
+        },
         primaryButton: {
             height: 50,
             borderRadius: 25,
