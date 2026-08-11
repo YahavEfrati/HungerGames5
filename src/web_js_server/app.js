@@ -12,6 +12,9 @@ const restaurantModel = require('./models/restaurant.model');
 const productModel = require('./models/product.model');
 const categoryRoutes = require('./routes/category.routes');
 const { seedCategories } = require('./models/category.model');
+////////////////////////////////////////////////////////////////////////////////
+const { seedDatabase } = require('./mockData');
+////////////////////////////////////////////////////////////////////////////////
 
 const app = express();
 
@@ -51,6 +54,9 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongodb:27017/hungergames'
 mongoose.connect(MONGO_URI).then(async () => {
     // Seed initial categories into the database
     await seedCategories();
+//////////////////////////////////////////////////////////////////////////////////////////////////
+    await seedDatabase();
+///////////////////////////////////////////////////////////////////////////////////////////////////
     // Connect to the TCP server before starting the HTTP server
     app.listen(PORT, () => {
     console.log(`[HTTP] Server is running on port ${PORT}`);
