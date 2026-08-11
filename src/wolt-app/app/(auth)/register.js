@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAppTheme } from '../constants/theme';
-import { registerUser } from '../services/userService';
-import { getStyles } from '../styles/register.styles';
+import { useTheme } from '../../constants/theme';
+import { registerUser } from '../../services/userService';
+import { getStyles } from '../../styles/register.styles';
 
 /**
  * Mobile Registration Screen Component for Wolt App.
@@ -26,8 +26,8 @@ import { getStyles } from '../styles/register.styles';
  */
 export default function RegisterScreen() {
     const router = useRouter();
-    const theme = useAppTheme();
-    const styles = getStyles(theme);
+    const { colors } = useTheme();
+    const styles = getStyles(colors);
 
     // Form Field States
     const [username, setUsername] = useState('');
@@ -343,7 +343,7 @@ export default function RegisterScreen() {
                             errors.username ? styles.inputError : null,
                         ]}
                         placeholder="Enter username"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={username}
                         onChangeText={(text) => {
                             setUsername(text);
@@ -385,7 +385,7 @@ export default function RegisterScreen() {
                             errors.password ? styles.inputError : null,
                         ]}
                         placeholder="Enter password"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={password}
                         onChangeText={(text) => {
                             setPassword(text);
@@ -407,7 +407,7 @@ export default function RegisterScreen() {
                             errors.verifyPassword ? styles.inputError : null,
                         ]}
                         placeholder="Re-enter password"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={verifyPassword}
                         onChangeText={(text) => {
                             setVerifyPassword(text);
@@ -429,7 +429,7 @@ export default function RegisterScreen() {
                             errors.name ? styles.inputError : null,
                         ]}
                         placeholder="Enter full name"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={name}
                         onChangeText={(text) => {
                             setName(text);
@@ -449,7 +449,7 @@ export default function RegisterScreen() {
                             errors.phone ? styles.inputError : null,
                         ]}
                         placeholder="Enter phone number (digits only)"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={phone}
                         onChangeText={(text) => {
                             setPhone(text);
@@ -470,7 +470,7 @@ export default function RegisterScreen() {
                             errors.addressX ? styles.inputError : null,
                         ]}
                         placeholder="e.g. 32.0853"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={addressX}
                         onChangeText={(text) => {
                             setAddressX(text);
@@ -491,7 +491,7 @@ export default function RegisterScreen() {
                             errors.addressY ? styles.inputError : null,
                         ]}
                         placeholder="e.g. 34.7818"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={addressY}
                         onChangeText={(text) => {
                             setAddressY(text);
@@ -515,7 +515,7 @@ export default function RegisterScreen() {
                     activeOpacity={0.8}
                 >
                     {loading && submittingRole === 'customer' ? (
-                        <ActivityIndicator color={theme.primaryText} />
+                        <ActivityIndicator color={colors.primaryText} />
                     ) : (
                         <Text style={styles.primaryButtonText}>
                             Register as Customer
@@ -533,7 +533,7 @@ export default function RegisterScreen() {
                     activeOpacity={0.8}
                 >
                     {loading && submittingRole === 'restaurant_owner' ? (
-                        <ActivityIndicator color={theme.secondaryText} />
+                        <ActivityIndicator color={colors.secondaryText} />
                     ) : (
                         <Text style={styles.secondaryButtonText}>
                             Register as Restaurant Owner

@@ -10,9 +10,9 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useAppTheme } from '../constants/theme';
-import { login as loginApi, saveToken } from '../services/authService';
-import { getStyles } from '../styles/login.styles';
+import { useAppTheme } from '../../constants/theme';
+import { login as loginApi, saveToken } from '../../services/authService';
+import { getStyles } from '../../styles/login.styles';
 
 /**
  * Mobile Login Screen Component for Wolt App (HG-224).
