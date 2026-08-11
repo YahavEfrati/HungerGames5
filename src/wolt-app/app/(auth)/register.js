@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import { registerUser } from '../../services/userService';
 import { getStyles } from '../../styles/register.styles';
+import ImagePickerModal from '../../components/ImagePickerModal';
 
 /**
  * Mobile Registration Screen Component for Wolt App.
@@ -542,44 +543,13 @@ export default function RegisterScreen() {
                 </TouchableOpacity>
             </ScrollView>
 
-            {/* Modal for Image Selection Choice */}
-            <Modal
+            {/* Reusable Image Picker Modal Component */}
+            <ImagePickerModal
                 visible={showPickerModal}
-                transparent
-                animationType="fade"
-                onRequestClose={() => setShowPickerModal(false)}
-            >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    activeOpacity={1}
-                    onPress={() => setShowPickerModal(false)}
-                >
-                    <View style={styles.modalCard}>
-                        <Text style={styles.modalTitle}>Select Profile Picture</Text>
-
-                        <TouchableOpacity
-                            style={styles.modalOption}
-                            onPress={takePhotoWithCamera}
-                        >
-                            <Text style={styles.modalOptionText}>Take Photo</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.modalOption}
-                            onPress={pickImageFromGallery}
-                        >
-                            <Text style={styles.modalOptionText}>Choose from Gallery</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.modalCancelOption}
-                            onPress={() => setShowPickerModal(false)}
-                        >
-                            <Text style={styles.modalCancelText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
-                </TouchableOpacity>
-            </Modal>
+                onClose={() => setShowPickerModal(false)}
+                onTakePhoto={takePhotoWithCamera}
+                onChooseGallery={pickImageFromGallery}
+            />
         </KeyboardAvoidingView>
     );
 }
