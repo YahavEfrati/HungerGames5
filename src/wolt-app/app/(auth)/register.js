@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAppTheme } from '../constants/theme';
-import { registerUser } from '../services/userService';
-import { getStyles } from '../styles/register.styles';
+import { useAppTheme } from '../../constants/theme';
+import { registerUser } from '../../services/userService';
+import { getStyles } from '../../styles/register.styles';
 
 /**
  * Mobile Registration Screen Component for Wolt App.
