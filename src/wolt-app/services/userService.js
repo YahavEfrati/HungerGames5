@@ -57,3 +57,71 @@ export const registerUser = async (userData) => {
 
     return responseData;
 };
+
+/**
+ * Fetches user profile data from backend using stored JWT token and userId.
+ * @param {string} token - The JWT token string.
+ * @param {string} userId - The user ID string.
+ * @returns {Promise<Object>} - User profile object.
+ */
+export const getUserProfile = async (token, userId) => {
+    if (!token) {
+        throw new Error('No authentication token provided');
+    }
+    if (!userId) {
+        throw new Error('No user ID provided');
+    }
+
+    const response = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+        const error = new Error(responseData.error || responseData.message || 'Failed to fetch user profile');
+        error.status = response.status;
+        throw error;
+    }
+
+    return responseData;
+};
+
+/**
+ * Updates user profile data on backend.
+ * @param {string} token - The JWT token string.
+ * @param {string} userId - The user ID string.
+ * @param {Object} updateData - Object containing name, phone, addressX, addressY, picture.
+ * @returns {Promise<Object>} - Updated user profile object.
+ */
+export const updateUserProfile = async (token, userId, updateData) => {
+    if (!token) {
+        throw new Error('No authentication token provided');
+    }
+    if (!userId) {
+        throw new Error('No user ID provided');
+    }
+
+    const response = await fetch(`${API_URL}/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+        const error = new Error(responseData.error || responseData.message || 'Failed to update user profile');
+        error.status = response.status;
+        throw error;
+    }
+
+    return responseData;
+};
