@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, StyleSheet, ActivityIndicator, StatusBar, Text, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { View, ScrollView, StyleSheet, ActivityIndicator, StatusBar, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import CategoriesCarousel from '../../components/CategoriesCarousel';
 import RestaurantCarousel from '../../components/RestaurantCarousel';
+import RestaurantCard from '../../components/RestaurantCard';
 import { API_URL } from '../../services/userService';
 
 export default function DiscoveryScreen() {
   const { colors } = useTheme();
+  const router = useRouter();
   
   // Data States
   const [categories, setCategories] = useState([]);
@@ -25,6 +28,9 @@ export default function DiscoveryScreen() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [tempLat, setTempLat] = useState('');
   const [tempLng, setTempLng] = useState('');
+
+  // Category Filtering State
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Fetch Categories and Top Rated on mount
   useEffect(() => {
@@ -111,6 +117,33 @@ export default function DiscoveryScreen() {
     }
   };
 
+  const handleCategorySelect = (categoryName) => {
+    // Toggle off if already selected
+    if (selectedCategory === categoryName) {
+      setSelectedCategory(null);
+    } else {
+      setSelectedCategory(categoryName);
+    }
+  };
+
+  // Determine base array to filter from
+  const hasLocation = currentLocation && currentLocation.lat && currentLocation.lng;
+  const baseRestaurants = (hasLocation && nearYouRestaurants.length > 0) ? nearYouRestaurants : topRatedRestaurants;
+  
+  // Safely filter based on the active category
+  const filteredRestaurants = selectedCategory 
+    ? baseRestaurants.filter(r => {
+        // Handle array of strings or comma-separated string from the backend
+        if (Array.isArray(r.categories)) {
+            return r.categories.includes(selectedCategory);
+        } else if (typeof r.categories === 'string') {
+            const parsedCategories = r.categories.split(',').map(c => c.trim());
+            return parsedCategories.includes(selectedCategory);
+        }
+        return false;
+      })
+    : [];
+
   const isInitialLoading = loadingCategories && loadingTopRated;
 
   return (
@@ -137,41 +170,72 @@ export default function DiscoveryScreen() {
         <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
           
           {categories.length > 0 && (
-            <CategoriesCarousel categories={categories} />
+            <CategoriesCarousel 
+              categories={categories} 
+              selectedCategory={selectedCategory}
+              onCategorySelect={handleCategorySelect}
+            />
           )}
 
-          {/* Dinner Near You Carousel */}
-          {loadingNearYou ? (
-            <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20, marginBottom: 20 }} />
+          {selectedCategory ? (
+            <View style={styles.filteredContainer}>
+              <Text style={[styles.filteredTitle, { color: colors.text }]}>
+                Restaurants for {selectedCategory}
+              </Text>
+              
+              {filteredRestaurants.length > 0 ? (
+                <View style={styles.gridContainer}>
+                  {filteredRestaurants.map(restaurant => (
+                    <View key={restaurant._id || restaurant.id} style={styles.gridItem}>
+                      <RestaurantCard {...restaurant} />
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Text style={{ color: colors.textSecondary }}>No restaurants found for this category.</Text>
+                  <TouchableOpacity onPress={() => setSelectedCategory(null)} style={[styles.modalButton, { backgroundColor: colors.primary, marginTop: 16, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10 }]}>
+                    <Text style={{ color: colors.primaryText, fontWeight: 'bold' }}>Clear Filter</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           ) : (
-            nearYouRestaurants.length > 0 && (
-              <RestaurantCarousel 
-                title="Dinner near you" 
-                restaurants={nearYouRestaurants} 
-                onSeeAllPress={() => console.log('See All Near You')}
-              />
-            )
-          )}
+            <>
+              {/* Dinner Near You Carousel */}
+              {loadingNearYou ? (
+                <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20, marginBottom: 20 }} />
+              ) : (
+                nearYouRestaurants.length > 0 && (
+                  <RestaurantCarousel 
+                    title="Dinner near you" 
+                    restaurants={nearYouRestaurants} 
+                    onSeeAllPress={() => router.push(`/see-all/near-you?lat=${currentLocation.lat}&lng=${currentLocation.lng}`)}
+                  />
+                )
+              )}
 
-          {/* Top Rated and All Restaurants */}
-          {loadingTopRated ? (
-            <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20 }} />
-          ) : (
-            topRatedRestaurants.length > 0 && (
-              <>
-                <RestaurantCarousel 
-                  title="Top Rated Restaurants ⭐" 
-                  restaurants={topRatedRestaurants} 
-                  onSeeAllPress={() => console.log('See All Top Rated')}
-                />
-                
-                <RestaurantCarousel 
-                  title="All Restaurants 🍔" 
-                  restaurants={[...topRatedRestaurants].reverse()} 
-                  onSeeAllPress={() => console.log('See All Restaurants')}
-                />
-              </>
-            )
+              {/* Top Rated and All Restaurants */}
+              {loadingTopRated ? (
+                <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20 }} />
+              ) : (
+                topRatedRestaurants.length > 0 && (
+                  <>
+                    <RestaurantCarousel 
+                      title="Top Rated Restaurants ⭐" 
+                      restaurants={topRatedRestaurants} 
+                      onSeeAllPress={() => router.push('/see-all/top-rated')}
+                    />
+                    
+                    <RestaurantCarousel 
+                      title="All Restaurants 🍔" 
+                      restaurants={[...topRatedRestaurants].reverse()} 
+                      onSeeAllPress={() => router.push('/see-all/all')}
+                    />
+                  </>
+                )
+              )}
+            </>
           )}
           
         </ScrollView>
@@ -254,6 +318,25 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
+  },
+  filteredContainer: {
+    paddingHorizontal: 16,
+  },
+  filteredTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  gridContainer: {
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  gridItem: {
+    marginBottom: 20,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
   },
   // Modal Styles
   modalOverlay: {

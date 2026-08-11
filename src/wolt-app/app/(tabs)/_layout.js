@@ -93,6 +93,12 @@ export default function TabLayout() {
           href: null, // Hide internal stack from tab bar
         }}
       />
+      <Tabs.Screen
+        name="see-all/[type]"
+        options={{
+          href: null, // Hide internal stack from tab bar
+        }}
+      />
     </Tabs>
   );
 }

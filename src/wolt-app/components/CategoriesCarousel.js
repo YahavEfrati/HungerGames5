@@ -10,16 +10,18 @@ const BOX_COLORS = [
   '#250c2b', // box-color-4
 ];
 
-export default function CategoriesCarousel({ categories }) {
+export default function CategoriesCarousel({ categories, selectedCategory, onCategorySelect }) {
   const { colors } = useTheme();
 
   const handleCategoryPress = (categoryName) => {
-    // TODO: Implement category action (e.g., filter restaurants or navigate)
-    console.log(`Category pressed: ${categoryName}`);
+    if (onCategorySelect) {
+      onCategorySelect(categoryName);
+    }
   };
 
   const renderItem = ({ item, index }) => {
     const boxColor = BOX_COLORS[index % BOX_COLORS.length];
+    const isSelected = selectedCategory === item.name;
 
     return (
       <TouchableOpacity 
@@ -27,10 +29,23 @@ export default function CategoriesCarousel({ categories }) {
         onPress={() => handleCategoryPress(item.name)}
         activeOpacity={0.8}
       >
-        <View style={[styles.squareBox, { backgroundColor: boxColor }]}>
+        <View 
+          style={[
+            styles.squareBox, 
+            { backgroundColor: boxColor },
+            isSelected && { borderWidth: 3, borderColor: colors.primary }
+          ]}
+        >
           <Text style={styles.boxIcon}>{item.icon}</Text>
         </View>
-        <Text style={[styles.cardName, { color: colors.text }]} numberOfLines={1}>
+        <Text 
+          style={[
+            styles.cardName, 
+            { color: isSelected ? colors.primary : colors.text },
+            isSelected && { fontWeight: 'bold' }
+          ]} 
+          numberOfLines={1}
+        >
           {item.name}
         </Text>
       </TouchableOpacity>
