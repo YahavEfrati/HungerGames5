@@ -10,9 +10,9 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useAppTheme } from '../../constants/theme';
+import { useTheme } from '../../constants/theme';
 import { login as loginApi, saveToken } from '../../services/authService';
-import { getStyles } from '../../styles/login.styles';
+import { createStyles } from '../../styles/login.styles';
 
 /**
  * Mobile Login Screen Component for Wolt App (HG-224).
@@ -22,8 +22,8 @@ import { getStyles } from '../../styles/login.styles';
 export default function LoginScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
-    const theme = useAppTheme();
-    const styles = getStyles(theme);
+    const { colors } = useTheme();
+    const styles = createStyles(colors);
 
     // Form Input States
     const [username, setUsername] = useState('');
@@ -154,7 +154,7 @@ export default function LoginScreen() {
                             validated && !username.trim() ? styles.inputError : null,
                         ]}
                         placeholder="Enter username"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={username}
                         onChangeText={(text) => {
                             setUsername(text);
@@ -177,7 +177,7 @@ export default function LoginScreen() {
                             validated && !password.trim() ? styles.inputError : null,
                         ]}
                         placeholder="Password"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={password}
                         onChangeText={(text) => {
                             setPassword(text);
@@ -199,7 +199,7 @@ export default function LoginScreen() {
                     activeOpacity={0.8}
                 >
                     {loading ? (
-                        <ActivityIndicator color={theme.primaryText} />
+                        <ActivityIndicator color={colors.primaryText} />
                     ) : (
                         <Text style={styles.primaryButtonText}>Login</Text>
                     )}

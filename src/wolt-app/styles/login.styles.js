@@ -1,15 +1,15 @@
 import { StyleSheet, Platform } from 'react-native';
 
 /**
- * Creates dynamic styles for the Mobile Login Screen based on active theme tokens.
- * @param {Object} theme - Active theme color tokens.
+ * Creates dynamic styles for the Mobile Login Screen based on active theme color tokens.
+ * @param {Object} colors - Active theme color tokens.
  * @returns {Object} StyleSheet object.
  */
-export const getStyles = (theme) =>
+export const createStyles = (colors) =>
     StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: theme.background,
+            backgroundColor: colors.background,
         },
         scrollContent: {
             paddingHorizontal: 24,
@@ -27,13 +27,13 @@ export const getStyles = (theme) =>
             fontWeight: '900',
             marginBottom: 8,
             letterSpacing: 0.5,
-            color: theme.primary,
+            color: colors.primary,
             textAlign: 'center',
         },
         subtitle: {
             fontSize: 16,
             fontWeight: '500',
-            color: theme.textSecondary,
+            color: colors.textSecondary,
             textAlign: 'center',
         },
         alertBanner: {
@@ -44,31 +44,31 @@ export const getStyles = (theme) =>
             alignItems: 'center',
         },
         errorBanner: {
-            backgroundColor: theme.errorBg,
-            borderColor: theme.error,
+            backgroundColor: colors.errorBg,
+            borderColor: colors.error,
         },
         successBanner: {
-            backgroundColor: theme.successBg,
-            borderColor: theme.success,
+            backgroundColor: colors.successBg,
+            borderColor: colors.success,
         },
         infoBanner: {
-            backgroundColor: theme.inputBg,
-            borderColor: theme.primary,
+            backgroundColor: colors.inputBg,
+            borderColor: colors.primary,
         },
         errorText: {
-            color: theme.error,
+            color: colors.error,
             fontSize: 14,
             fontWeight: '600',
             textAlign: 'center',
         },
         successText: {
-            color: theme.success,
+            color: colors.success,
             fontSize: 14,
             fontWeight: '600',
             textAlign: 'center',
         },
         infoText: {
-            color: theme.primary,
+            color: colors.primary,
             fontSize: 14,
             fontWeight: '600',
             textAlign: 'center',
@@ -80,7 +80,7 @@ export const getStyles = (theme) =>
             fontSize: 14,
             fontWeight: '600',
             marginBottom: 8,
-            color: theme.text,
+            color: colors.text,
         },
         input: {
             height: 48,
@@ -88,15 +88,15 @@ export const getStyles = (theme) =>
             borderRadius: 8,
             paddingHorizontal: 14,
             fontSize: 15,
-            backgroundColor: theme.inputBg,
-            color: theme.inputText,
-            borderColor: theme.inputBorder,
+            backgroundColor: colors.inputBg,
+            color: colors.inputText,
+            borderColor: colors.inputBorder,
         },
         inputError: {
-            borderColor: theme.error,
+            borderColor: colors.error,
         },
         fieldErrorText: {
-            color: theme.error,
+            color: colors.error,
             fontSize: 12,
             marginTop: 6,
             fontWeight: '500',
@@ -108,12 +108,12 @@ export const getStyles = (theme) =>
             alignItems: 'center',
             marginTop: 12,
             marginBottom: 12,
-            backgroundColor: theme.primary,
+            backgroundColor: colors.primary,
         },
         primaryButtonText: {
             fontSize: 16,
             fontWeight: '700',
-            color: theme.primaryText,
+            color: colors.primaryText,
         },
         secondaryButton: {
             height: 50,
@@ -122,13 +122,13 @@ export const getStyles = (theme) =>
             justifyContent: 'center',
             alignItems: 'center',
             marginBottom: 12,
-            backgroundColor: theme.secondary,
-            borderColor: theme.border,
+            backgroundColor: colors.secondary,
+            borderColor: colors.border,
         },
         secondaryButtonText: {
             fontSize: 16,
             fontWeight: '700',
-            color: theme.secondaryText,
+            color: colors.secondaryText,
         },
         linkButton: {
             height: 44,
@@ -139,9 +139,12 @@ export const getStyles = (theme) =>
         linkButtonText: {
             fontSize: 15,
             fontWeight: '600',
-            color: theme.text,
+            color: colors.text,
         },
         disabledButton: {
             opacity: 0.6,
         },
     });
+
+// Alias for backwards compatibility
+export const getStyles = createStyles;
