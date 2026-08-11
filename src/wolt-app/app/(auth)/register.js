@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAppTheme } from '../../constants/theme';
+import { useTheme } from '../../constants/theme';
 import { registerUser } from '../../services/userService';
 import { getStyles } from '../../styles/register.styles';
 
@@ -25,8 +25,8 @@ import { getStyles } from '../../styles/register.styles';
  */
 export default function RegisterScreen() {
     const router = useRouter();
-    const theme = useAppTheme();
-    const styles = getStyles(theme);
+    const { colors } = useTheme();
+    const styles = getStyles(colors);
 
     // Form Field States
     const [username, setUsername] = useState('');
@@ -317,7 +317,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter username"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={username}
                         onChangeText={setUsername}
                         autoCapitalize="none"
@@ -350,7 +350,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter password"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry
@@ -363,7 +363,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Re-enter password"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={verifyPassword}
                         onChangeText={setVerifyPassword}
                         secureTextEntry
@@ -376,7 +376,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter full name"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={name}
                         onChangeText={setName}
                     />
@@ -387,7 +387,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter phone number (digits only)"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={phone}
                         onChangeText={setPhone}
                         keyboardType="phone-pad"
@@ -399,7 +399,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="e.g. 32.0853"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={addressX}
                         onChangeText={setAddressX}
                         keyboardType="numeric"
@@ -411,7 +411,7 @@ export default function RegisterScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="e.g. 34.7818"
-                        placeholderTextColor={theme.inputPlaceholder}
+                        placeholderTextColor={colors.inputPlaceholder}
                         value={addressY}
                         onChangeText={setAddressY}
                         keyboardType="numeric"
@@ -429,7 +429,7 @@ export default function RegisterScreen() {
                     activeOpacity={0.8}
                 >
                     {loading && submittingRole === 'customer' ? (
-                        <ActivityIndicator color={theme.primaryText} />
+                        <ActivityIndicator color={colors.primaryText} />
                     ) : (
                         <Text style={styles.primaryButtonText}>
                             Register as Customer
@@ -447,7 +447,7 @@ export default function RegisterScreen() {
                     activeOpacity={0.8}
                 >
                     {loading && submittingRole === 'restaurant_owner' ? (
-                        <ActivityIndicator color={theme.secondaryText} />
+                        <ActivityIndicator color={colors.secondaryText} />
                     ) : (
                         <Text style={styles.secondaryButtonText}>
                             Register as Restaurant Owner

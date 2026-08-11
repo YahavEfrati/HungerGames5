@@ -1,16 +1,20 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Image } from 'react-native';
+import { useTheme } from '../../constants/theme';
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+  
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#00c2e8',
-        tabBarInactiveTintColor: '#888888',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
         },
         // TODO: Style this Tab Bar exactly like Wolt later
       }}
@@ -26,7 +30,7 @@ export default function TabLayout() {
                 width: 24, 
                 height: 24, 
                 // Tint the icon color dynamically based on its active state
-                tintColor: focused ? '#00c2e8' : '#8e8e93' 
+                tintColor: focused ? colors.primary : colors.textSecondary 
               }} 
             />
           ),
@@ -43,7 +47,7 @@ export default function TabLayout() {
                 width: 24, 
                 height: 24, 
                 // Tint the icon color dynamically based on its active state
-                tintColor: focused ? '#00c2e8' : '#8e8e93' 
+                tintColor: focused ? colors.primary : colors.textSecondary 
               }} 
             />
           ),
@@ -60,7 +64,7 @@ export default function TabLayout() {
                 width: 24, 
                 height: 24, 
                 // Tint the icon color dynamically based on its active state
-                tintColor: focused ? '#00c2e8' : '#8e8e93' 
+                tintColor: focused ? colors.primary : colors.textSecondary 
               }} 
             />
           ),
@@ -77,7 +81,7 @@ export default function TabLayout() {
                 width: 24, 
                 height: 24, 
                 // Tint the icon color dynamically based on its active state
-                tintColor: focused ? '#00c2e8' : '#8e8e93' 
+                tintColor: focused ? colors.primary : colors.textSecondary 
               }} 
             />
           ),
