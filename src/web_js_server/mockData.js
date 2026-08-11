@@ -23,8 +23,8 @@ async function seedDatabase() {
 
         // 2. Create a mock user to serve as the required ownerId for restaurants
         const mockOwner = await User.create({
-            username: `mockowner_${Date.now()}`,
-            password: 'mockpassword',
+            username: `admin`,
+            password: '1234',
             name: 'Mock Restaurant Owner',
             phone: '050-1234567',
             addressX: 32.0853,
