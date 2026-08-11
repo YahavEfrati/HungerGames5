@@ -12,7 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import { API_URL } from '../../services/userService';
-import RestaurantCard from '../../components/RestaurantCard';
+import LargeRestaurantCard from '../../components/LargeRestaurantCard';
+import ProductSearchItem from '../../components/ProductSearchItem';
 import { createStyles } from '../../styles/search.styles';
 
 /**
@@ -30,6 +31,30 @@ export default function SearchScreen() {
   // Results state: payload layout matching backend { restaurants: [], products: [] }
   const [searchResults, setSearchResults] = useState({ restaurants: [], products: [] });
   const [loading, setLoading] = useState(false);
+  const [restaurantCategoryMap, setRestaurantCategoryMap] = useState({});
+
+  // Workaround for the search API returning category ObjectIds when the server hasn't been restarted.
+  // We fetch the full restaurants list (which properly populates categories) to build a mapping.
+  useEffect(() => {
+    const fetchRestaurantsForCategories = async () => {
+      try {
+        const res = await fetch(`${API_URL}/restaurants`);
+        if (res.ok) {
+          const data = await res.json();
+          const map = {};
+          data.forEach(r => {
+            if (r._id && r.categories && r.categories.length > 0) {
+              map[r._id] = r.categories[0];
+            }
+          });
+          setRestaurantCategoryMap(map);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch restaurants map:", err);
+      }
+    };
+    fetchRestaurantsForCategories();
+  }, []);
 
   /**
    * Real-time search effect with 300ms debouncing logic matching the Web frontend.
@@ -118,7 +143,7 @@ export default function SearchScreen() {
             <View style={styles.restaurantsList}>
               {searchResults.restaurants.map((restaurant, index) => (
                 <View key={restaurant._id || restaurant.id || `res-${index}`} style={styles.restaurantItemWrapper}>
-                  <RestaurantCard {...restaurant} />
+                  <LargeRestaurantCard {...restaurant} restaurantCategoryMap={restaurantCategoryMap} />
                 </View>
               ))}
             </View>
@@ -132,31 +157,10 @@ export default function SearchScreen() {
           <Text style={styles.sectionTitle}>Dishes & Products</Text>
           {searchResults.products.length > 0 ? (
             searchResults.products.map((product, index) => (
-              <TouchableOpacity
-                key={product._id || product.id || `prod-${index}`}
-                style={styles.productCard}
-                activeOpacity={0.8}
-                onPress={() => {
-                  if (product.restaurantId) {
-                    router.push(`/restaurant/${product.restaurantId}`);
-                  }
-                }}
-              >
-                {product.restaurantName && (
-                  <Text style={styles.productHeader}>
-                    Offered by: <Text style={styles.productRestaurantName}>{product.restaurantName}</Text>
-                  </Text>
-                )}
-                <Text style={styles.productTitle}>{product.name}</Text>
-                {product.description ? (
-                  <Text style={styles.productDescription} numberOfLines={2}>
-                    {product.description}
-                  </Text>
-                ) : null}
-                <Text style={styles.productPrice}>
-                  ${product.price ? parseFloat(product.price).toFixed(2) : '0.00'}
-                </Text>
-              </TouchableOpacity>
+              <ProductSearchItem 
+                key={product._id || product.id || `prod-${index}`} 
+                {...product} 
+              />
             ))
           ) : (
             <Text style={styles.noResultsText}>No dishes found matching your search.</Text>

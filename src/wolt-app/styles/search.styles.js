@@ -71,39 +71,7 @@ export const createStyles = (colors) =>
       marginBottom: 16,
       alignItems: 'center',
     },
-    productCard: {
-      backgroundColor: colors.card,
-      borderRadius: 12,
-      padding: 14,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    productHeader: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginBottom: 4,
-    },
-    productRestaurantName: {
-      color: colors.primary,
-      fontWeight: 'bold',
-    },
-    productTitle: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: 4,
-    },
-    productDescription: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      marginBottom: 8,
-    },
-    productPrice: {
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: colors.primary,
-    },
+
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
