@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../constants/theme';
-import { login as loginApi, saveToken } from '../../services/authService';
-import { createStyles } from '../../styles/login.styles';
+import { login as loginApi, saveToken, saveUser } from '../../services/authService';
+import { getStyles } from '../../styles/login.styles';
 
 /**
  * Mobile Login Screen Component for Wolt App (HG-224).
@@ -23,7 +23,7 @@ export default function LoginScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { colors } = useTheme();
-    const styles = createStyles(colors);
+    const styles = getStyles(colors);
 
     // Form Input States
     const [username, setUsername] = useState('');
@@ -86,9 +86,14 @@ export default function LoginScreen() {
         try {
             const data = await loginApi(cleanUsername, cleanPassword);
 
-            // Store received JWT token in AsyncStorage under key 'userToken'
-            if (data && data.token) {
-                await saveToken(data.token);
+            // Store received JWT token and user info in AsyncStorage
+            const tokenToSave = data?.token || data?.authorization;
+            const userToSave = data?.user;
+            if (tokenToSave) {
+                await saveToken(tokenToSave);
+            }
+            if (userToSave) {
+                await saveUser(userToSave);
             }
 
             console.log('Login successful!');
