@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useTheme } from '../constants/theme';
 import RestaurantCard from './RestaurantCard';
+import { createStyles } from '../styles/restaurantCarousel.styles';
 
 export default function RestaurantCarousel({ title, restaurants, onSeeAllPress }) {
   const { colors } = useTheme();
+  const styles = createStyles(colors);
 
   return (
     <View style={styles.container}>
@@ -28,27 +30,3 @@ export default function RestaurantCarousel({ title, restaurants, onSeeAllPress }
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: 32,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  seeAll: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  listContainer: {
-    paddingHorizontal: 16, // So items don't stick to screen edges
-  },
-});

@@ -32,6 +32,22 @@ services:
       - cpp-server
       - mongodb
 
+  react-frontend:
+    build:
+      context: ./src/react-fronted
+      dockerfile: Dockerfile
+    ports:
+      - "4000:3000"
+    volumes:
+      - ./src/react-fronted:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=http://localhost:${NODE_PORT:-3000}/api
+    depends_on:
+      - web-js-server
+      - cpp-server
+
   wolt-app:
     build:
       context: ./src/wolt-app

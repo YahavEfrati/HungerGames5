@@ -1,4 +1,5 @@
 const restaurantModel = require('../models/restaurant.model');
+const productModel = require('../models/product.model');
 
 /**
  * Search Service.
@@ -18,43 +19,6 @@ class SearchService {
         const lowerCaseQuery = query.toLowerCase()
         const regex = new RegExp(query, 'i');
 
-        const isMatch = item => 
-            item?.name?.toLowerCase().includes(lowerCaseQuery) || 
-            item?.description?.toLowerCase().includes(lowerCaseQuery);
-
-        const docs = await restaurantModel.find({
-            $or: [
-                { name: regex }, 
-                { description: regex }, 
-                { 'products.name': regex }, 
-                { 'products.description': regex }
-            ]
-        });
-
-        const matchingRestaurants = [];
-        const matchingProducts = [];
-
-        for (const doc of docs) {
-            const rest = doc.toObject ? doc.toObject() : { ...doc };
-            
-            if (isMatch(rest)) {
-                const { products, ...cleanRest } = rest;
-                matchingRestaurants.push(cleanRest);
-            }
-            
-            if (rest.products && Array.isArray(rest.products)) {
-                for (const product of rest.products) {
-                    if (isMatch(product)) {
-                        matchingProducts.push({
-                            ...product,
-                            restaurantId: rest._id,
-                            restaurantName: rest.name
-                        });
-                    }
-                }
-            }
-        }
-        
         const sortItems = (a, b) => {
             const aName = (a.name || '').toLowerCase();
             const bName = (b.name || '').toLowerCase();
@@ -71,6 +35,41 @@ class SearchService {
             return 0;
         };
 
+        // 1. Search for matching restaurants
+        const rawRestaurants = await restaurantModel.find({
+            $or: [
+                { name: regex }, 
+                { description: regex }
+            ]
+        }).populate('categories', 'name').lean();
+
+        // Map populated Category objects to just their string names
+        const matchingRestaurants = rawRestaurants.map(rest => {
+            return {
+                ...rest,
+                categories: rest.categories && Array.isArray(rest.categories) 
+                    ? rest.categories.map(cat => (cat && cat.name) ? cat.name : cat)
+                    : []
+            };
+        });
+
+        // 2. Search for matching products in the distinct Product collection
+        const rawProducts = await productModel.find({
+            $or: [
+                { name: regex }, 
+                { description: regex }
+            ]
+        }).populate('restaurantId', 'name').lean();
+
+        // 3. Format products to match the expected frontend structure
+        const matchingProducts = rawProducts.map(product => {
+            return {
+                ...product,
+                restaurantId: product.restaurantId ? product.restaurantId._id : null,
+                restaurantName: product.restaurantId ? product.restaurantId.name : null
+            };
+        });
+
         matchingRestaurants.sort(sortItems);
         matchingProducts.sort(sortItems);
 
@@ -78,7 +77,7 @@ class SearchService {
             restaurants: matchingRestaurants,
             products: matchingProducts
         };
-            }
+    }
 }
 
 module.exports = new SearchService();

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useTheme } from '../constants/theme';
+import { createStyles } from '../styles/categoriesCarousel.styles';
 
 const BOX_COLORS = [
   '#05233a', // box-color-0
@@ -12,6 +13,7 @@ const BOX_COLORS = [
 
 export default function CategoriesCarousel({ categories, selectedCategory, onCategorySelect }) {
   const { colors } = useTheme();
+  const styles = createStyles(colors);
 
   const handleCategoryPress = (categoryName) => {
     if (onCategorySelect) {
@@ -67,44 +69,3 @@ export default function CategoriesCarousel({ categories, selectedCategory, onCat
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
-    borderRadius: 16,
-    marginBottom: 24,
-    marginHorizontal: 16, // Adds some breathing room from screen edges
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
-    paddingHorizontal: 20,
-  },
-  listContainer: {
-    paddingHorizontal: 20, // Pad the inner scroll view so items don't stick to the edge
-    gap: 16,
-  },
-  cardWrapper: {
-    alignItems: 'center',
-    marginRight: 16, // Space between items
-  },
-  squareBox: {
-    width: 70,
-    height: 70,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    marginBottom: 10,
-  },
-  boxIcon: {
-    fontSize: 24,
-  },
-  cardName: {
-    fontSize: 12,
-    fontWeight: '600',
-    textAlign: 'center',
-    maxWidth: 90,
-  },
-});

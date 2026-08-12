@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { useTheme } from '../constants/theme';
 import { useRouter } from 'expo-router';
+import { createStyles } from '../styles/restaurantCard.styles';
 
 export default function RestaurantCard({ _id, id, name, description, distance, image }) {
   const { colors } = useTheme();
+  const styles = createStyles(colors);
   const router = useRouter();
   
   const restaurantId = _id || id;
@@ -55,58 +57,3 @@ export default function RestaurantCard({ _id, id, name, description, distance, i
     </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  cardContainer: {
-    width: 240,
-    marginRight: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3, // For Android
-  },
-  card: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  image: {
-    width: '100%',
-    height: 120,
-  },
-  infoContainer: {
-    padding: 12,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  textContainer: {
-    flex: 1,
-    marginRight: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 12,
-  },
-  distanceBadge: {
-    backgroundColor: '#293166',
-    borderRadius: 8,
-    width: 50,
-    height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  distanceValue: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  distanceUnit: {
-    color: '#ffffff',
-    fontSize: 11,
-  },
-});
