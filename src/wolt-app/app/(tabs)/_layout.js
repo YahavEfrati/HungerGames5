@@ -2,9 +2,11 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { Image } from 'react-native';
 import { useTheme } from '../../constants/theme';
+import { createLayoutStyles } from '../../styles/layout.styles';
 
 export default function TabLayout() {
   const { colors } = useTheme();
+  const styles = createLayoutStyles(colors);
   
   return (
     <Tabs
@@ -26,12 +28,10 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Image 
               source={require('../../assets/icons/home-icon-silhouette.png')} 
-              style={{ 
-                width: 24, 
-                height: 24, 
-                // Tint the icon color dynamically based on its active state
-                tintColor: focused ? colors.primary : colors.textSecondary 
-              }} 
+              style={[
+                styles.tabIcon, 
+                { tintColor: focused ? colors.primary : colors.textSecondary }
+              ]} 
             />
           ),
         }}
@@ -43,12 +43,10 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Image 
               source={require('../../assets/icons/search.png')} 
-              style={{ 
-                width: 24, 
-                height: 24, 
-                // Tint the icon color dynamically based on its active state
-                tintColor: focused ? colors.primary : colors.textSecondary 
-              }} 
+              style={[
+                styles.tabIcon, 
+                { tintColor: focused ? colors.primary : colors.textSecondary }
+              ]} 
             />
           ),
         }}
@@ -60,12 +58,10 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Image 
               source={require('../../assets/icons/shopping-cart.png')} 
-              style={{ 
-                width: 24, 
-                height: 24, 
-                // Tint the icon color dynamically based on its active state
-                tintColor: focused ? colors.primary : colors.textSecondary 
-              }} 
+              style={[
+                styles.tabIcon, 
+                { tintColor: focused ? colors.primary : colors.textSecondary }
+              ]} 
             />
           ),
         }}
@@ -77,12 +73,10 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Image 
               source={require('../../assets/icons/account.png')} 
-              style={{ 
-                width: 24, 
-                height: 24, 
-                // Tint the icon color dynamically based on its active state
-                tintColor: focused ? colors.primary : colors.textSecondary 
-              }} 
+              style={[
+                styles.tabIcon, 
+                { tintColor: focused ? colors.primary : colors.textSecondary }
+              ]} 
             />
           ),
         }}
