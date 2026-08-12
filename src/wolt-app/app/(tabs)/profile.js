@@ -34,8 +34,8 @@ import ImagePickerModal from '../../components/ImagePickerModal';
  * 7. Logout Button: Prominently located at bottom, clears token from AsyncStorage and redirects to login/gateway.
  */
 export default function ProfileScreen() {
-  const { colors } = useTheme();
-  const styles = createStyles(colors);
+  const router = useRouter();
+  const { colors, isDarkMode, toggleTheme } = useTheme();
 
   // Memoize dynamic styles based on theme colors to prevent re-render loops on theme toggle
   const styles = useMemo(() => getStyles(colors), [colors]);
