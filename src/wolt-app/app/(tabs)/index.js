@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, ScrollView, ActivityIndicator, StatusBar, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import CategoriesCarousel from '../../components/CategoriesCarousel';
 import RestaurantCarousel from '../../components/RestaurantCarousel';
 import RestaurantCard from '../../components/RestaurantCard';
 import { API_URL } from '../../services/userService';
+import { getUser } from '../../services/authService';
+import OwnerRestaurantView from '../../components/OwnerRestaurantView';
 import { createStyles } from '../../styles/index.styles';
 
 export default function DiscoveryScreen() {
@@ -14,6 +16,11 @@ export default function DiscoveryScreen() {
   const styles = createStyles(colors);
   const router = useRouter();
   
+  // User Auth & Role State
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
+  const [checkingRole, setCheckingRole] = useState(true);
+
   // Data States
   const [categories, setCategories] = useState([]);
   const [topRatedRestaurants, setTopRatedRestaurants] = useState([]);
@@ -23,6 +30,37 @@ export default function DiscoveryScreen() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingTopRated, setLoadingTopRated] = useState(true);
   const [loadingNearYou, setLoadingNearYou] = useState(false);
+
+  // Re-check user role whenever Discovery screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      let isMounted = true;
+      const checkUserRole = async () => {
+        try {
+          const user = await getUser();
+          if (isMounted) {
+            if (user && user.role === 'restaurant_owner') {
+              setCurrentUser(user);
+              setIsOwner(true);
+            } else {
+              setCurrentUser(user);
+              setIsOwner(false);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to get user role in Discovery:', err);
+          if (isMounted) {
+            setCurrentUser(null);
+            setIsOwner(false);
+          }
+        } finally {
+          if (isMounted) setCheckingRole(false);
+        }
+      };
+      checkUserRole();
+      return () => { isMounted = false; };
+    }, [])
+  );
 
   // Location States
   // Initialize with a mock default location (Tel Aviv)
@@ -147,6 +185,27 @@ export default function DiscoveryScreen() {
     : [];
 
   const isInitialLoading = loadingCategories && loadingTopRated;
+
+  if (checkingRole) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isOwner) {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
+        <StatusBar barStyle={colors.background === '#0a0c17' ? 'light-content' : 'dark-content'} />
+        <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 10 }}>
+          <OwnerRestaurantView currentUser={currentUser} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
