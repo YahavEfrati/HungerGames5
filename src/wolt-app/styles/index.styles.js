@@ -99,4 +99,41 @@ export const createStyles = (colors) =>
     modalButton: {
       marginLeft: 16,
     },
+    centerIndicator: {
+      marginTop: 20,
+      marginBottom: 20,
+    },
+    topRatedIndicator: {
+      marginTop: 20,
+    },
+    emptyText: {
+      color: colors.textSecondary,
+    },
+    clearFilterButton: {
+      backgroundColor: colors.primary,
+      marginTop: 16,
+      borderRadius: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      marginLeft: 16,
+    },
+    clearFilterButtonText: {
+      color: colors.primaryText,
+      fontWeight: 'bold',
+    },
+    cancelButtonText: {
+      color: colors.textSecondary,
+      fontWeight: '600',
+    },
+    updateLocationButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      marginLeft: 16,
+    },
+    updateLocationButtonText: {
+      color: colors.primaryText,
+      fontWeight: 'bold',
+    },
   });
