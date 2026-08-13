@@ -3,6 +3,7 @@ const User = require('./models/user.model');
 const Restaurant = require('./models/restaurant.model');
 const Product = require('./models/product.model');
 const { Category } = require('./models/category.model');
+const Order = require('./models/order.model');
 
 async function seedDatabase() {
     try {
@@ -83,9 +84,40 @@ async function seedDatabase() {
         await Restaurant.insertMany(restaurantsToInsert);
 
         // 4. Insert the Product documents, which now correctly reference the inserted Restaurants
-        await Product.insertMany(productsToInsert);
+        const insertedProducts = await Product.insertMany(productsToInsert);
 
-        console.log('Database successfully seeded with 20 restaurants and 100 products!');
+        // --- TODO: REMOVE BEFORE PR - MOCK ORDERS ---
+        const mockOrdersToInsert = [
+            {
+                userId: mockOwner._id,
+                restaurantId: insertedProducts[0].restaurantId,
+                items: [
+                    { productId: insertedProducts[0]._id, quantity: 2 },
+                    { productId: insertedProducts[1]._id, quantity: 1 }
+                ],
+                totalPrice: (insertedProducts[0].price * 2) + insertedProducts[1].price,
+                status: 'pending',
+                tip: 10,
+                addressX: mockOwner.addressX,
+                addressY: mockOwner.addressY
+            },
+            {
+                userId: mockOwner._id,
+                restaurantId: insertedProducts[2].restaurantId,
+                items: [
+                    { productId: insertedProducts[2]._id, quantity: 1 }
+                ],
+                totalPrice: insertedProducts[2].price,
+                status: 'completed',
+                tip: 5,
+                addressX: mockOwner.addressX,
+                addressY: mockOwner.addressY
+            }
+        ];
+        await Order.insertMany(mockOrdersToInsert);
+        // --- END MOCK ORDERS ---
+
+        console.log('Database successfully seeded with 20 restaurants, 100 products, and 2 mock orders!');
     } catch (error) {
         console.error('Error seeding database:', error);
     }
