@@ -13,10 +13,18 @@ function transformRestaurantDTO(restaurantDoc) {
     // The frontend expects products to be fetched separately, so we remove them
     delete dto.products;
 
-    // Map populated Category objects (which have a 'name' property) to just their string names.
-    // If it's already a string or a raw ObjectId without a name, we leave it as is to avoid errors.
+    // Retain populated Category objects with _id, name, icon or keep strings
     if (dto.categories && Array.isArray(dto.categories)) {
-        dto.categories = dto.categories.map(cat => (cat && cat.name) ? cat.name : cat);
+        dto.categories = dto.categories.map(cat => {
+            if (cat && typeof cat === 'object') {
+                return {
+                    _id: String(cat._id || cat.id),
+                    name: cat.name || '',
+                    icon: cat.icon || ''
+                };
+            }
+            return cat;
+        });
     }
     
     return dto;
