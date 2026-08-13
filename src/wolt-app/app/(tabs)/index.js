@@ -254,9 +254,9 @@ export default function DiscoveryScreen() {
                 </View>
               ) : (
                 <View style={styles.emptyContainer}>
-                  <Text style={{ color: colors.textSecondary }}>No restaurants found for this category.</Text>
-                  <TouchableOpacity onPress={() => setSelectedCategory(null)} style={[styles.modalButton, { backgroundColor: colors.primary, marginTop: 16, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10 }]}>
-                    <Text style={{ color: colors.primaryText, fontWeight: 'bold' }}>Clear Filter</Text>
+                  <Text style={styles.emptyText}>No restaurants found for this category.</Text>
+                  <TouchableOpacity onPress={() => setSelectedCategory(null)} style={styles.clearFilterButton}>
+                    <Text style={styles.clearFilterButtonText}>Clear Filter</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -265,7 +265,7 @@ export default function DiscoveryScreen() {
             <>
               {/* Dinner Near You Carousel */}
               {loadingNearYou ? (
-                <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20, marginBottom: 20 }} />
+                <ActivityIndicator size="small" color={colors.primary} style={styles.centerIndicator} />
               ) : (
                 nearYouRestaurants.length > 0 && (
                   <RestaurantCarousel 
@@ -278,7 +278,7 @@ export default function DiscoveryScreen() {
 
               {/* Top Rated and All Restaurants */}
               {loadingTopRated ? (
-                <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 20 }} />
+                <ActivityIndicator size="small" color={colors.primary} style={styles.topRatedIndicator} />
               ) : (
                 topRatedRestaurants.length > 0 && (
                   <>
@@ -335,10 +335,10 @@ export default function DiscoveryScreen() {
 
             <View style={styles.modalActions}>
               <TouchableOpacity onPress={() => setIsLocationModalOpen(false)} style={styles.modalButton}>
-                <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleSaveLocation} style={[styles.modalButton, { backgroundColor: colors.primary, borderRadius: 20, paddingHorizontal: 20, paddingVertical: 10 }]}>
-                <Text style={{ color: colors.primaryText, fontWeight: 'bold' }}>Update</Text>
+              <TouchableOpacity onPress={handleSaveLocation} style={styles.updateLocationButton}>
+                <Text style={styles.updateLocationButtonText}>Update</Text>
               </TouchableOpacity>
             </View>
           </View>

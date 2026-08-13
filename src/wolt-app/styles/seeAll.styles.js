@@ -51,4 +51,8 @@ export const createStyles = (colors) =>
       paddingVertical: 12,
       borderRadius: 24,
     },
+    actionButtonText: {
+      color: colors.primaryText,
+      fontWeight: 'bold',
+    },
   });

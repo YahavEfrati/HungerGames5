@@ -103,7 +103,7 @@ export default function SeeAllScreen() {
             style={[styles.actionButton, { backgroundColor: colors.primary }]}
             onPress={() => router.back()}
           >
-            <Text style={{ color: colors.primaryText, fontWeight: 'bold' }}>Go Back</Text>
+            <Text style={styles.actionButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       )}

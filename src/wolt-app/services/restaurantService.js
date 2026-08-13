@@ -39,26 +39,59 @@ export const getOwnerRestaurants = async (ownerId) => {
 };
 
 /**
- * Fetches a single restaurant by ID.
- * @param {string} id - Restaurant ID.
- * @returns {Promise<Object>} Restaurant details.
+ * Fetches the restaurant details by its ID.
+ * @param {string} id - The restaurant ID.
+ * @returns {Promise<Object>} The restaurant object.
  */
 export const getRestaurantById = async (id) => {
-    const response = await fetch(`${API_URL}/restaurants/${id}`, {
-        method: 'GET',
-        headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-        },
-    });
+    try {
+        const response = await fetch(`${API_URL}/restaurants/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to fetch restaurant details');
+        if (!response.ok) {
+            throw new Error(data.error || data.message || 'Failed to fetch restaurant details');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error fetching restaurant by ID:', error);
+        throw error;
     }
+};
 
-    return data;
+/**
+ * Fetches the products (menu) of a specific restaurant.
+ * @param {string} id - The restaurant ID.
+ * @returns {Promise<Array>} The list of products.
+ */
+export const getRestaurantProducts = async (id) => {
+    try {
+        const response = await fetch(`${API_URL}/restaurants/${id}/products`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+
+        if (!response.ok) {
+            return []; // Fallback to empty array if no products or error
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching restaurant products:', error);
+        return [];
+    }
 };
 
 /**
