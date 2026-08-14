@@ -44,7 +44,8 @@ export default function SearchScreen() {
           const map = {};
           data.forEach(r => {
             if (r._id && r.categories && r.categories.length > 0) {
-              map[r._id] = r.categories[0];
+              const first = r.categories[0];
+              map[r._id] = typeof first === 'object' && first !== null ? (first.name || '') : String(first);
             }
           });
           setRestaurantCategoryMap(map);

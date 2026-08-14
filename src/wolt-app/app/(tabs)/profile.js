@@ -289,7 +289,7 @@ export default function ProfileScreen() {
       if (err.status === 401 || err.status === 404) {
         await removeToken();
         setIsAuthenticated(false);
-        router.push('/login');
+        router.replace('/(auth)/login');
       } else {
         setError(err.message || 'Failed to update profile');
       }
@@ -299,7 +299,7 @@ export default function ProfileScreen() {
   };
 
   /**
-   * Handles user logout: clears AsyncStorage token and redirects to Auth/Login screen.
+   * Handles user logout: clears AsyncStorage token and navigates to Auth/Login screen via replace.
    */
   const handleLogout = async () => {
     try {
@@ -316,7 +316,7 @@ export default function ProfileScreen() {
       setIsEditMode(false);
       setError('');
       setSuccess('');
-      router.push('/login');
+      router.replace('/(auth)/login');
     } catch (err) {
       console.error('Error during logout:', err);
     }
@@ -342,7 +342,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity
             style={styles.gatewayLoginBtn}
-            onPress={() => router.push('/login')}
+            onPress={() => router.replace('/(auth)/login')}
             activeOpacity={0.8}
           >
             <Text style={styles.gatewayLoginBtnText}>Login</Text>

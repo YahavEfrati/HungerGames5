@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const restaurantModel = require('../models/restaurant.model');
 const { POPULAR_CATEGORIES } = require('../models/category.model');
 
@@ -33,9 +34,24 @@ class RestaurantService {
             }
         }
 
+        if (data.addressX !== undefined) {
+            const numX = typeof data.addressX === 'number' ? data.addressX : parseFloat(data.addressX);
+            if (isNaN(numX)) return false;
+            data.addressX = numX;
+        }
+
+        if (data.addressY !== undefined) {
+            const numY = typeof data.addressY === 'number' ? data.addressY : parseFloat(data.addressY);
+            if (isNaN(numY)) return false;
+            data.addressY = numY;
+        }
+
         if (data.categories !== undefined) {
             if (!Array.isArray(data.categories)) return false;
-            const isValid = data.categories.every(cat => typeof cat === 'string' && validCategoryNames.includes(cat));
+            const isValid = data.categories.every(cat => 
+                (typeof cat === 'string' || typeof cat === 'object') && 
+                (validCategoryNames.includes(cat) || (cat && (mongoose.Types.ObjectId.isValid(cat) || mongoose.Types.ObjectId.isValid(cat._id))))
+            );
             if (!isValid) return false;
         }
 
