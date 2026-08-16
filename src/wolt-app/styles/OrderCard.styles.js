@@ -1,4 +1,4 @@
-yimport { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 /**
  * Creates dynamic styles for the OrderCard component.
@@ -87,5 +87,39 @@ export const createOrderCardStyles = (colors) => StyleSheet.create({
     cancelButtonText: {
         color: colors.error,
         fontWeight: '600',
+    },
+    expandedSection: {
+        marginTop: 16,
+        paddingTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: colors.border,
+    },
+    expandedHeader: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: colors.textSecondary,
+        marginBottom: 8,
+    },
+    expandedItemRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 6,
+    },
+    expandedItemName: {
+        fontSize: 14,
+        color: colors.text,
+        flex: 1,
+    },
+    expandedItemQty: {
+        fontSize: 14,
+        color: colors.textSecondary,
+        marginHorizontal: 8,
+        fontWeight: 'bold',
+    },
+    expandedItemPrice: {
+        fontSize: 14,
+        color: colors.text,
+        fontWeight: '500',
     }
 });
