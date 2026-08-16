@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   View, 
   Text, 
@@ -12,8 +12,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '../../../constants/theme';
 import { createRestaurantStyles } from '../../../styles/restaurant.styles';
 import { getRestaurantById, getRestaurantProducts } from '../../../services/restaurantService';
+import { getUser } from '../../../services/authService';
 import ProductCard from '../../../components/ProductCard';
 import ProductModal from '../../../components/ProductModal';
+import ProductFormModal from '../../../components/ProductFormModal';
 
 export default function RestaurantScreen() {
   const { id } = useLocalSearchParams();
@@ -21,14 +23,42 @@ export default function RestaurantScreen() {
   const { colors } = useTheme();
   const styles = createRestaurantStyles(colors);
 
+  const [currentUser, setCurrentUser] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Modal State
+  // Consumer Cart Modal State
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  // Owner Product Management Modal State (null product = Add mode, product object = Edit/Delete mode)
+  const [formModalVisible, setFormModalVisible] = useState(false);
+  const [selectedProductForForm, setSelectedProductForForm] = useState(null);
+
+  useEffect(() => {
+    const loadCurrentUser = async () => {
+      try {
+        const user = await getUser();
+        setCurrentUser(user);
+      } catch (err) {
+        console.error('Failed to load user info:', err);
+      }
+    };
+    loadCurrentUser();
+  }, []);
+
+  const isOwner = useMemo(() => {
+    if (!currentUser || currentUser.role !== 'restaurant_owner' || !restaurant?.ownerId) {
+      return false;
+    }
+    const currentUserId = currentUser._id || currentUser.id;
+    const restaurantOwnerId = typeof restaurant.ownerId === 'object' && restaurant.ownerId !== null
+      ? (restaurant.ownerId._id || restaurant.ownerId.id)
+      : restaurant.ownerId;
+    return String(currentUserId) === String(restaurantOwnerId);
+  }, [currentUser, restaurant]);
 
   const fetchRestaurantData = async () => {
     try {
@@ -55,8 +85,33 @@ export default function RestaurantScreen() {
   }, [id]);
 
   const handleProductPress = (product) => {
-    setSelectedProduct(product);
-    setIsModalVisible(true);
+    if (isOwner) {
+      setSelectedProductForForm(product);
+      setFormModalVisible(true);
+    } else {
+      setSelectedProduct(product);
+      setIsModalVisible(true);
+    }
+  };
+
+  const handleOpenAddProduct = () => {
+    setSelectedProductForForm(null);
+    setFormModalVisible(true);
+  };
+
+  const handleProductFormSuccess = (action, payload) => {
+    if (action === 'add') {
+      if (payload) setProducts((prev) => [...prev, payload]);
+      else fetchRestaurantData();
+    } else if (action === 'delete') {
+      const deletedId = payload?._id || payload?.id;
+      setProducts((prev) => prev.filter((p) => (p._id || p.id) !== deletedId));
+    } else if (action === 'update') {
+      const updatedId = payload?._id || payload?.id;
+      setProducts((prev) =>
+        prev.map((p) => ((p._id || p.id) === updatedId ? payload : p))
+      );
+    }
   };
 
   const handleAddToCart = (orderItem) => {
@@ -146,7 +201,18 @@ export default function RestaurantScreen() {
 
         {/* Menu Section */}
         <View style={styles.menuContainer}>
-          <Text style={styles.menuTitle}>Menu</Text>
+          <View style={styles.menuHeaderRow}>
+            <Text style={styles.menuTitle}>Menu</Text>
+            {isOwner && (
+              <TouchableOpacity
+                style={styles.addProductButton}
+                onPress={handleOpenAddProduct}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.addProductButtonText}>+ Add Product</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           {products.length > 0 ? (
             products.map((product) => (
               <ProductCard 
@@ -161,12 +227,21 @@ export default function RestaurantScreen() {
         </View>
       </ScrollView>
 
-      {/* Product Customization Modal */}
+      {/* Consumer Product Customization Modal */}
       <ProductModal
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         product={selectedProduct}
         onAddToCart={handleAddToCart}
+      />
+
+      {/* Owner Unified Product Management Modal (Add / Edit / Delete) */}
+      <ProductFormModal
+        visible={formModalVisible}
+        onClose={() => setFormModalVisible(false)}
+        product={selectedProductForForm}
+        restaurantId={id}
+        onSuccess={handleProductFormSuccess}
       />
     </View>
   );
