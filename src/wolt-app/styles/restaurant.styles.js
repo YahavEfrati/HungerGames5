@@ -146,11 +146,29 @@ export const createRestaurantStyles = (colors) =>
     menuContainer: {
       padding: 20,
     },
+    menuHeaderRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
     menuTitle: {
       fontSize: 24,
       fontWeight: 'bold',
       color: colors.text,
-      marginBottom: 16,
+    },
+    addProductButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    addProductButtonText: {
+      color: colors.primaryText,
+      fontWeight: 'bold',
+      fontSize: 14,
     },
     emptyMenuText: {
       fontSize: 16,
