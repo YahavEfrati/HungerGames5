@@ -1,6 +1,8 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { ThemeProvider, useTheme } from '../constants/theme';
+import { CartProvider } from '../context/CartContext';
+import CartDrawer from '../components/CartDrawer';
 
 function RootLayoutNav() {
 	const { colors } = useTheme();
@@ -15,6 +17,7 @@ function RootLayoutNav() {
 		>
 			<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 			<Stack.Screen name="(auth)" options={{ headerShown: false }} />
+			<Stack.Screen name="checkout" options={{ headerShown: false }} />
 		</Stack>
 	);
 }
@@ -22,7 +25,12 @@ function RootLayoutNav() {
 export default function RootLayout() {
 	return (
 		<ThemeProvider>
-			<RootLayoutNav />
+			<CartProvider>
+				<RootLayoutNav />
+				<CartDrawer />
+			</CartProvider>
 		</ThemeProvider>
 	);
 }
+
+
