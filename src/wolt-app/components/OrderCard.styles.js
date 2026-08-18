@@ -1,4 +1,5 @@
-yimport { StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+
 
 /**
  * Creates dynamic styles for the OrderCard component.
