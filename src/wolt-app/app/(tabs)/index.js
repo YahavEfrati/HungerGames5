@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, ActivityIndicator, StatusBar, Text, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -6,20 +6,24 @@ import { useTheme } from '../../constants/theme';
 import CategoriesCarousel from '../../components/CategoriesCarousel';
 import RestaurantCarousel from '../../components/RestaurantCarousel';
 import RestaurantCard from '../../components/RestaurantCard';
+import OwnerRestaurantView from '../../components/OwnerRestaurantView';
+import CartButton from '../../components/CartButton';
 import { API_URL } from '../../services/userService';
 import { getUser } from '../../services/authService';
-import OwnerRestaurantView from '../../components/OwnerRestaurantView';
 import { createStyles } from '../../styles/index.styles';
+
 
 export default function DiscoveryScreen() {
   const { colors } = useTheme();
   const styles = createStyles(colors);
   const router = useRouter();
-  
+
+
   // User Auth & Role State
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [checkingRole, setCheckingRole] = useState(true);
+
 
   // Data States
   const [categories, setCategories] = useState([]);
@@ -345,6 +349,10 @@ export default function DiscoveryScreen() {
         </View>
       </Modal>
 
+      {/* Floating Cart Button (for consumers) */}
+      <CartButton />
+
     </SafeAreaView>
   );
 }
+

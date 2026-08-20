@@ -6,7 +6,6 @@ import {
   Image, 
   TouchableOpacity, 
   ScrollView,
-  Alert
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTheme } from '../../../constants/theme';
@@ -16,12 +15,16 @@ import { getUser } from '../../../services/authService';
 import ProductCard from '../../../components/ProductCard';
 import ProductModal from '../../../components/ProductModal';
 import ProductFormModal from '../../../components/ProductFormModal';
+import CartButton from '../../../components/CartButton';
+import { useCart } from '../../../context/CartContext';
+
 
 export default function RestaurantScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { colors } = useTheme();
   const styles = createRestaurantStyles(colors);
+  const { addToCart } = useCart();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [restaurant, setRestaurant] = useState(null);
@@ -115,13 +118,14 @@ export default function RestaurantScreen() {
   };
 
   const handleAddToCart = (orderItem) => {
-    // TODO: Integrate with full Cart Context in the next task
-    // Placeholder action for now
-    Alert.alert(
-      "Added to Order",
-      `${orderItem.quantity}x ${orderItem.name} added to your cart.\nNotes: ${orderItem.notes || 'None'}`,
-      [{ text: "OK" }]
-    );
+    if (restaurant) {
+      addToCart(orderItem, {
+        _id: restaurant._id || id,
+        id: restaurant._id || id,
+        name: restaurant.name,
+        minimumOrder: restaurant.minimumOrder,
+      });
+    }
   };
 
   if (loading) {
@@ -227,6 +231,9 @@ export default function RestaurantScreen() {
         </View>
       </ScrollView>
 
+      {/* Floating Cart Button (Only for non-owners) */}
+      {!isOwner && <CartButton />}
+
       {/* Consumer Product Customization Modal */}
       <ProductModal
         visible={isModalVisible}
@@ -246,3 +253,4 @@ export default function RestaurantScreen() {
     </View>
   );
 }
+

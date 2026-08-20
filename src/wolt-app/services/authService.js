@@ -96,3 +96,19 @@ export const removeToken = async () => {
         console.error('Failed to remove token from storage:', err);
     }
 };
+
+/**
+ * Helper function to generate authorization headers with JWT token.
+ * @returns {Promise<Object>} Headers object with Content-Type and Authorization (if logged in).
+ */
+export const getAuthHeaders = async () => {
+    const token = await getToken();
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+};
+
