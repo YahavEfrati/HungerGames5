@@ -82,8 +82,11 @@ export default function DiscoveryScreen() {
       try {
         const res = await fetch(`${API_URL}/categories`);
         const data = await res.json();
-        if (data && data.POPULAR_CATEGORIES) {
-          setCategories(data.POPULAR_CATEGORIES);
+        
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else {
+          setCategories([]);
         }
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -92,7 +95,7 @@ export default function DiscoveryScreen() {
       }
     };
 
-    const fetchTopRated = async () => {
+    const fetchTopRated =   async () => {
       try {
         const res = await fetch(`${API_URL}/restaurants?sort=topRated`, {
           method: 'GET',
