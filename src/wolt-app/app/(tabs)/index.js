@@ -173,23 +173,81 @@ export default function DiscoveryScreen() {
     }
   };
 
-  // Determine base array to filter from
-  const hasLocation = currentLocation && currentLocation.lat && currentLocation.lng;
-  const baseRestaurants = (hasLocation && nearYouRestaurants.length > 0) ? nearYouRestaurants : topRatedRestaurants;
-  
-  // Safely filter based on the active category
-  const filteredRestaurants = selectedCategory 
-    ? baseRestaurants.filter(r => {
-        // Handle array of strings or comma-separated string from the backend
-        if (Array.isArray(r.categories)) {
-            return r.categories.includes(selectedCategory);
-        } else if (typeof r.categories === 'string') {
-            const parsedCategories = r.categories.split(',').map(c => c.trim());
-            return parsedCategories.includes(selectedCategory);
+  // Build a lookup map of category ID -> category name
+  const catIdToNameMap = useMemo(() => {
+    const map = {};
+    if (Array.isArray(categories)) {
+      categories.forEach(cat => {
+        if (!cat) return;
+        const name = (cat.name || '').toLowerCase().trim();
+        const id = String(cat._id || cat.id || '').trim();
+        if (id && name) {
+          map[id] = name;
         }
+      });
+    }
+    return map;
+  }, [categories]);
+
+  // Determine base array to filter from (combine nearYou and topRated to ensure complete dataset)
+  const baseRestaurants = useMemo(() => {
+    const map = new Map();
+    (nearYouRestaurants || []).forEach(r => {
+      const id = r._id || r.id;
+      if (id) map.set(String(id), r);
+    });
+    (topRatedRestaurants || []).forEach(r => {
+      const id = r._id || r.id;
+      if (id && !map.has(String(id))) map.set(String(id), r);
+    });
+    return Array.from(map.values());
+  }, [nearYouRestaurants, topRatedRestaurants]);
+
+  // Safely filter based on the active category (supports category objects, strings, ObjectIds, and mapped IDs)
+  const filteredRestaurants = useMemo(() => {
+    if (!selectedCategory) return [];
+
+    const targetStr = (typeof selectedCategory === 'string'
+      ? selectedCategory
+      : (selectedCategory.name || selectedCategory._id || '')
+    ).toLowerCase().trim();
+
+    return baseRestaurants.filter(r => {
+      if (!r || !r.categories) return false;
+
+      let rawList = [];
+      if (Array.isArray(r.categories)) {
+        rawList = r.categories;
+      } else if (typeof r.categories === 'string') {
+        rawList = r.categories.split(',').map(s => s.trim());
+      }
+
+      return rawList.some(c => {
+        if (!c) return false;
+
+        // If category is an object { _id, name, icon }
+        if (typeof c === 'object') {
+          const name = (c.name || '').toLowerCase().trim();
+          const id = String(c._id || c.id || '').toLowerCase().trim();
+          return name === targetStr || id === targetStr;
+        }
+
+        // If category is a string (could be name, ID, or unpopulated ObjectId)
+        if (typeof c === 'string') {
+          const val = c.toLowerCase().trim();
+          if (val === targetStr) return true;
+
+          // Check if string is an ObjectId mapped in catIdToNameMap
+          const mappedName = catIdToNameMap[c] || catIdToNameMap[val];
+          if (mappedName && mappedName.toLowerCase().trim() === targetStr) {
+            return true;
+          }
+        }
+
         return false;
-      })
-    : [];
+      });
+    });
+  }, [selectedCategory, baseRestaurants, catIdToNameMap]);
 
   const isInitialLoading = loadingCategories && loadingTopRated;
 
