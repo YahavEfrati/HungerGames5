@@ -25,6 +25,9 @@ export const createEditModalStyles = (colors) => StyleSheet.create({
         color: colors.text,
         marginBottom: 16,
     },
+    mainScroll: {
+        flexShrink: 1,
+    },
     inputGroup: {
         marginBottom: 16,
     },
@@ -137,5 +140,64 @@ export const createEditModalStyles = (colors) => StyleSheet.create({
         color: colors.textSecondary,
         fontStyle: 'italic',
         marginBottom: 8,
+    },
+    expandableBarContainer: {
+        marginTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: colors.border,
+        paddingTop: 12,
+    },
+    expandBarHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+    },
+    expandBarTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: colors.primary,
+    },
+    expandBarIcon: {
+        fontSize: 18,
+        color: colors.primary,
+        fontWeight: 'bold',
+    },
+    availableProductsList: {
+        marginTop: 12,
+        maxHeight: 150,
+    },
+    availableProductRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: colors.border,
+    },
+    availableProductInfo: {
+        flex: 1,
+        marginRight: 8,
+    },
+    availableProductName: {
+        color: colors.text,
+        fontSize: 14,
+        fontWeight: '500',
+    },
+    availableProductPrice: {
+        color: colors.textSecondary,
+        fontSize: 12,
+        marginTop: 2,
+    },
+    addBtn: {
+        backgroundColor: colors.primary,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 6,
+    },
+    addBtnText: {
+        color: colors.primaryText,
+        fontSize: 12,
+        fontWeight: 'bold',
     }
 });
