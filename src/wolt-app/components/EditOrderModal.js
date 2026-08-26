@@ -16,6 +16,7 @@ export default function EditOrderModal({ visible, onClose, order, onSave }) {
     const [availableProducts, setAvailableProducts] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(null);
+    const [isAddProductExpanded, setIsAddProductExpanded] = useState(false); // State for the expandable bottom bar
 
     // Sync order data and load products when modal opens
     useEffect(() => {
@@ -24,6 +25,7 @@ export default function EditOrderModal({ visible, onClose, order, onSave }) {
             setAddressY(order.addressY?.toString() || '0');
             setTip(order.tip?.toString() || '0');
             setError(null);
+            setIsAddProductExpanded(false); // Reset expandable state
             
             // Load available products for this restaurant to resolve names/prices
             const loadProducts = async () => {
@@ -58,6 +60,30 @@ export default function EditOrderModal({ visible, onClose, order, onSave }) {
             }
             return item;
         }).filter(item => item.quantity > 0)); // Remove if quantity drops to 0
+    };
+
+    /**
+     * Adds a new product to the order or increments its quantity if it already exists.
+     */
+    const handleAddProduct = (prod) => {
+        const productId = prod._id || prod.id;
+        
+        setItems(prev => {
+            const existing = prev.find(item => item.productId === productId);
+            if (existing) {
+                return prev.map(item => 
+                    item.productId === productId
+                        ? { ...item, quantity: item.quantity + 1 }
+                        : item
+                );
+            }
+            return [...prev, {
+                productId,
+                quantity: 1,
+                name: prod.name,
+                price: Number(prod.price)
+            }];
+        });
     };
 
     const handleSaveClick = async () => {
@@ -103,7 +129,7 @@ export default function EditOrderModal({ visible, onClose, order, onSave }) {
                 <View style={styles.modalContainer}>
                     <Text style={styles.modalTitle}>Edit Pending Order</Text>
                     
-                    <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+                    <ScrollView style={styles.mainScroll} showsVerticalScrollIndicator={false} bounces={false}>
                         {error && <Text style={styles.errorText}>{error}</Text>}
 
                         <View style={styles.inputGroup}>
@@ -170,6 +196,39 @@ export default function EditOrderModal({ visible, onClose, order, onSave }) {
                             ))}
                         </View>
                     </ScrollView>
+                        
+                    {/* Expandable Section for Adding New Products (Moved outside the main ScrollView) */}
+                    <View style={styles.expandableBarContainer}>
+                        <TouchableOpacity 
+                            style={styles.expandBarHeader} 
+                            onPress={() => setIsAddProductExpanded(!isAddProductExpanded)}
+                        >
+                            <Text style={styles.expandBarTitle}>+ Add New Product</Text>
+                            <Text style={styles.expandBarIcon}>{isAddProductExpanded ? '−' : '+'}</Text>
+                        </TouchableOpacity>
+                        
+                        {isAddProductExpanded && (
+                            <ScrollView style={styles.availableProductsList} nestedScrollEnabled={true}>
+                                {availableProducts.length === 0 && (
+                                    <Text style={styles.emptyItemsText}>No additional products available.</Text>
+                                )}
+                                {availableProducts.map(prod => (
+                                    <View key={prod._id || prod.id} style={styles.availableProductRow}>
+                                        <View style={styles.availableProductInfo}>
+                                            <Text style={styles.availableProductName} numberOfLines={1}>{prod.name}</Text>
+                                            <Text style={styles.availableProductPrice}>₪{Number(prod.price).toFixed(2)}</Text>
+                                        </View>
+                                        <TouchableOpacity 
+                                            style={styles.addBtn}
+                                            onPress={() => handleAddProduct(prod)}
+                                        >
+                                            <Text style={styles.addBtnText}>Add</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
 
                     <View style={styles.buttonRow}>
                         <TouchableOpacity 
