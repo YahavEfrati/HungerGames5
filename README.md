@@ -46,6 +46,5 @@ Ensure you have Node.js installed on your local machine.
 Open a new terminal and navigate to the React Native app directory (e.g., cd src/wolt-app).
 Start the Metro bundler and launch the app on your running Android emulator:
 
-bash
-npx expo start
+`npx expo start`
 (Then press a to open the app on Android).
