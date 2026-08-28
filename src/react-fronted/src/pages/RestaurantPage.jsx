@@ -163,7 +163,9 @@ const RestaurantPage = () => {
                                     <span className="wolt-stat-separator">•</span>
                                     <div className="wolt-stat-item d-flex align-items-center flex-wrap gap-1">
                                         {restaurant.categories.map((cat, idx) => (
-                                            <span key={idx} className="badge rounded-pill" style={{ backgroundColor: '#e0f7fa', color: '#006064', fontSize: '0.75rem', fontWeight: 'bold' }}>{cat}</span>
+                                            <span key={idx} className="badge rounded-pill" style={{ backgroundColor: '#e0f7fa', color: '#006064', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                                                {cat.name || cat}
+                                            </span>
                                         ))}
                                     </div>
                                 </>

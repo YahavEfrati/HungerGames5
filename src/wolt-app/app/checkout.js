@@ -162,7 +162,8 @@ export default function CheckoutScreen() {
     // Place Order Flow
     const handlePlaceOrder = async () => {
         const token = await getToken();
-        if (!token) {
+        const user = await getUser();
+        if (!token || !user) {
             Alert.alert(
                 'Login Required',
                 'Please log in to your account to place your order.',

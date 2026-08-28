@@ -1,5 +1,5 @@
 import { API_URL } from './userService';
-import { getAuthHeaders } from './authService';
+import { fetchWithAuth } from './authService';
 
 const ORDERS_URL = `${API_URL}/orders`;
 
@@ -11,10 +11,8 @@ const ORDERS_URL = `${API_URL}/orders`;
  * @returns {Promise<Object>} The server response or success metadata.
  */
 export const createOrder = async (orderData) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(ORDERS_URL, {
+    const response = await fetchWithAuth(ORDERS_URL, {
         method: 'POST',
-        headers,
         body: JSON.stringify(orderData),
     });
 
@@ -39,11 +37,9 @@ export const createOrder = async (orderData) => {
  * @returns {Promise<Array>} List of user orders.
  */
 export const getOrders = async (userId) => {
-    const headers = await getAuthHeaders();
     const url = userId ? `${ORDERS_URL}?userId=${userId}` : ORDERS_URL;
-    const response = await fetch(url, {
+    const response = await fetchWithAuth(url, {
         method: 'GET',
-        headers,
     });
 
     if (!response.ok) {
@@ -62,10 +58,8 @@ export const getOrders = async (userId) => {
  * @returns {Promise<Object>} Order details.
  */
 export const getOrderById = async (orderId) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${ORDERS_URL}/${orderId}`, {
+    const response = await fetchWithAuth(`${ORDERS_URL}/${orderId}`, {
         method: 'GET',
-        headers,
     });
 
     if (!response.ok) {
@@ -85,10 +79,8 @@ export const getOrderById = async (orderId) => {
  * @returns {Promise<Object|null>} Updated order or null on 204.
  */
 export const updateOrder = async (orderId, updateData) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${ORDERS_URL}/${orderId}`, {
+    const response = await fetchWithAuth(`${ORDERS_URL}/${orderId}`, {
         method: 'PATCH',
-        headers,
         body: JSON.stringify(updateData),
     });
 
@@ -112,10 +104,8 @@ export const updateOrder = async (orderId, updateData) => {
  * @returns {Promise<boolean>} True if cancelled successfully.
  */
 export const cancelOrder = async (orderId) => {
-    const headers = await getAuthHeaders();
-    const response = await fetch(`${ORDERS_URL}/${orderId}`, {
+    const response = await fetchWithAuth(`${ORDERS_URL}/${orderId}`, {
         method: 'DELETE',
-        headers,
     });
 
     if (!response.ok) {

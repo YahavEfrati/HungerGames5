@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshContr
 import { Redirect } from 'expo-router';
 import { useTheme } from '../../constants/theme';
 import { createOrdersStyles } from '../../styles/orders.styles';
-import { getToken } from '../../services/authService';
+import { getToken, getUser } from '../../services/authService';
 import { getOrders, cancelOrder, updateOrder } from '../../services/orderService';
 import OrderCard from '../../components/OrderCard';
 import EditOrderModal from '../../components/EditOrderModal';
@@ -38,8 +38,9 @@ export default function OrdersScreen() {
         const checkAuth = async () => {
             try {
                 const token = await getToken();
+                const user = await getUser();
                 if (isMounted) {
-                    setIsAuthenticated(!!token);
+                    setIsAuthenticated(!!token && !!user);
                     setIsLoadingAuth(false);
                 }
             } catch (err) {
@@ -62,6 +63,10 @@ export default function OrdersScreen() {
             const sortedOrders = fetchedOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setOrders(sortedOrders);
         } catch (err) {
+            // Ignore intentional auth errors since the global interceptor is already redirecting
+            if (err.message && err.message.includes('Forbidden')) {
+                return; 
+            }
             console.error('Error fetching orders:', err);
             setError(err.message || 'Failed to load orders.');
         } finally {

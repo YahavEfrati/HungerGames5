@@ -76,6 +76,10 @@ export default function ProfileScreen() {
       const storedUser = await getUser();
 
       if (!token || !storedUser) {
+        // If state is inconsistent (e.g., token saved but user crashed), wipe everything cleanly
+        if (token || storedUser) {
+            await removeToken();
+        }
         setIsAuthenticated(false);
         setIsCheckingAuth(false);
         return;

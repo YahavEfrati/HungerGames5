@@ -51,7 +51,9 @@ export const saveToken = async (token) => {
 export const saveUser = async (user) => {
     try {
         if (user) {
-            await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+            // Strip out large Base64 fields to prevent SQLITE_FULL (6MB limit) on Android
+            const { picture, ...userToSave } = user;
+            await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userToSave));
         }
     } catch (err) {
         console.error('Failed to save user info to storage:', err);
@@ -110,5 +112,55 @@ export const getAuthHeaders = async () => {
         headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
+};
+
+/**
+ * Handles automatic logout when a session expires or is unauthorized.
+ * Clears local storage and redirects the user to the login screen.
+ */
+export const performAutoLogout = async () => {
+    try {
+        await removeToken();
+        // Use Expo Router to redirect the user globally to the login screen
+        const { router } = require('expo-router');
+        router.replace({
+            pathname: '/(auth)/login',
+            params: { relayMessage: 'Session expired. Please log in again.' }
+        });
+    } catch (err) {
+        console.error('Failed to perform auto logout:', err);
+    }
+};
+
+/**
+ * A global fetch wrapper that automatically attaches authorization headers
+ * and intercepts 401/403 responses to trigger an automatic logout.
+ * 
+ * @param {string} url - The API endpoint URL.
+ * @param {Object} options - Fetch options (method, body, headers).
+ * @returns {Promise<Response>} The fetch Response object.
+ */
+export const fetchWithAuth = async (url, options = {}) => {
+    const headers = await getAuthHeaders();
+    
+    // Merge default auth headers with any custom headers provided in options
+    const finalOptions = {
+        ...options,
+        headers: {
+            ...headers,
+            ...(options.headers || {})
+        }
+    };
+    
+    const response = await fetch(url, finalOptions);
+    
+    // Intercept unauthorized or forbidden responses (Expired or Invalid Token)
+    if (response.status === 401 || response.status === 403) {
+        await performAutoLogout();
+        // Throw an error so the calling service doesn't attempt to parse a failed response
+        throw new Error('Forbidden: Invalid or expired token');
+    }
+    
+    return response;
 };
 

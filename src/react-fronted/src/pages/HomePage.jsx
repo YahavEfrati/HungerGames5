@@ -44,7 +44,8 @@ function HomePage() {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3000/api'}/categories`);
         const data = await res.json();
-        setCategories(data.POPULAR_CATEGORIES);
+        // The API returns an array of categories directly, ensure we always set an array
+        setCategories(data.POPULAR_CATEGORIES || (Array.isArray(data) ? data : []));
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
