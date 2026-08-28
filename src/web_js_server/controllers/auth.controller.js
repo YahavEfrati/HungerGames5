@@ -13,12 +13,15 @@ class AuthController {
      * @param {Object} res - Express response object.
      */
     async login(req, res) {
-        const { username, password } = req.body;
+        let { username, password } = req.body;
 
         // Ensure both fields are present
         if (!username || !password) {
             return res.status(400).json({ error: "Username and password are required" });
         }
+
+        // Normalize username to match Mongoose trim behavior
+        username = username.trim();
         try {
             // Delegate the verification logic to the User Service (Added await)
             const userId = await userService.verifyCredentials(username, password);
