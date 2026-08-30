@@ -32,25 +32,26 @@ services:
       - cpp-server
       - mongodb
 
-  wolt-app:
+
+
+  react-fronted:
     build:
-      context: ./src/wolt-app
+      context: ./src/react-fronted
       dockerfile: Dockerfile
-    stdin_open: true
-    tty: true
+    # Map host port 4000 to container port 3000 (React default)
     ports:
-      - "8081:8081"
-      - "19000:19000"
-      - "19001:19001"
+      - "4000:3000"
     volumes:
-      - ./src/wolt-app:/app
+      - ./src/react-fronted:/app
       - /app/node_modules
     environment:
+      # Ensure hot reloading works correctly in a WSL/Ubuntu environment
       - CHOKIDAR_USEPOLLING=true
-      - EXPO_PUBLIC_API_URL=http://localhost:${NODE_PORT:-3000}/api
+      - WATCHPACK_POLLING=true
+      # Explicitly set the API URL so React knows where the backend is
+      - REACT_APP_API_URL=http://localhost:${NODE_PORT:-3000}/api
     depends_on:
       - web-js-server
-      - cpp-server
 
   tests:
     build: 

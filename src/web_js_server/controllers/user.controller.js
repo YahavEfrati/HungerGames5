@@ -12,8 +12,11 @@ class UserController {
      * @param {Object} res - Express response object.
      */
     async createUser(req, res) {
-        const { username, password, name, phone, addressX, addressY, role, picture } = req.body;
+        let { username, password, name, phone, addressX, addressY, role, picture } = req.body;
         
+        // Normalize username to match Mongoose schema trim behavior
+        username = username ? username.trim() : '';
+
         const parsedAddressX = parseFloat(addressX);
         const parsedAddressY = parseFloat(addressY);
         
