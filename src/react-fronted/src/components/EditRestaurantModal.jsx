@@ -27,6 +27,10 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
 
     useEffect(() => {
         if (restaurant && show) {
+            const initialCategories = Array.isArray(restaurant.categories)
+                ? restaurant.categories.map(c => (typeof c === 'object' && c !== null ? String(c._id || c.id || '') : String(c))).filter(Boolean)
+                : [];
+
             setFormData({ 
                 name: restaurant.name || '', 
                 description: restaurant.description || '', 
@@ -35,7 +39,7 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
                 addressY: restaurant.addressY || '', 
                 kosher: restaurant.kosher || false, 
                 working_hours: restaurant.working_hours || '',
-                categories: restaurant.categories && Array.isArray(restaurant.categories) ? restaurant.categories : [],
+                categories: initialCategories,
                 image: restaurant.image || '' 
             });
             setError(null);
@@ -46,6 +50,14 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
 
     if (!restaurant) return null;
 
+    const currentCatIds = (formData.categories || [])
+        .map(c => (typeof c === 'object' && c !== null ? String(c._id || c.id || '') : String(c)))
+        .filter(Boolean);
+    const origCatIds = (restaurant.categories || [])
+        .map(c => (typeof c === 'object' && c !== null ? String(c._id || c.id || '') : String(c)))
+        .filter(Boolean);
+    const isCategoriesDirty = JSON.stringify([...currentCatIds].sort()) !== JSON.stringify([...origCatIds].sort());
+
     const isDirty = 
         formData.name !== restaurant.name || 
         formData.phone !== restaurant.phone ||
@@ -54,7 +66,7 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
         formData.description !== restaurant.description ||
         formData.working_hours !== restaurant.working_hours ||
         formData.kosher !== restaurant.kosher ||
-        JSON.stringify(formData.categories) !== JSON.stringify(restaurant.categories ? restaurant.categories : []) ||
+        isCategoriesDirty ||
         formData.image !== restaurant.image;
 
     const handleSave = async () => {
@@ -79,6 +91,9 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
             setIsSaving(true);
             setError(null);
 
+            const categoryIds = (Array.isArray(formData.categories) ? formData.categories : [])
+                .map(c => (typeof c === 'object' && c !== null ? String(c._id || c.id || '') : String(c)))
+                .filter(id => Boolean(id) && id !== '[object Object]');
 
             const updatedRestData = {
                 name: formData.name.trim(),
@@ -88,7 +103,7 @@ const EditRestaurantModal = ({ show, onHide, restaurant, onRestaurantUpdate }) =
                 addressY: Number(formData.addressY),
                 kosher: formData.kosher,
                 working_hours: formData.working_hours.trim(),
-                categories: formData.categories,
+                categories: categoryIds,
                 image: formData.image.trim()
             };
 

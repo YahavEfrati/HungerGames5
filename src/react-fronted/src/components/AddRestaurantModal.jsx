@@ -58,6 +58,9 @@ const AddRestaurantModal = ({ show, onHide, onRestaurantAdded }) => {
             setIsSaving(true);
             setError(null);
             
+            const categoryIds = (Array.isArray(formData.categories) ? formData.categories : [])
+                .map(c => (typeof c === 'object' && c !== null ? String(c._id || c.id || '') : String(c)))
+                .filter(id => Boolean(id) && id !== '[object Object]');
 
             const newRest = await addRestaurant({
                 name: formData.name.trim(),
@@ -67,7 +70,7 @@ const AddRestaurantModal = ({ show, onHide, onRestaurantAdded }) => {
                 addressY: Number(formData.addressY),
                 kosher: formData.kosher,
                 working_hours: formData.working_hours.trim(),
-                categories: formData.categories,
+                categories: categoryIds,
                 image: formData.image.trim()
             });
             
