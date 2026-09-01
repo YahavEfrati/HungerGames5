@@ -47,7 +47,7 @@ docker compose up -d --build
 ![Docker Up Success](./screenshots/docker_up.png)
 
 ### Step 3.2: Start the Mobile Application
-Once the backend is fully running, open a **separate terminal**, navigate into the mobile app directory, and start the Expo server:
+Once the backend is fully running, navigate into the mobile app directory, and start the Expo server by running:
 
 ```bash
 cd src/wolt-app && npm install && npx expo start
