@@ -67,7 +67,7 @@ export default function DiscoveryScreen() {
   );
 
   // Location States
-  // Initialize with a mock default location (Tel Aviv)
+  // Initialize with a default location (Tel Aviv)
   const [currentLocation, setCurrentLocation] = useState({ lat: 32.0853, lng: 34.7818 });
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [tempLat, setTempLat] = useState('');

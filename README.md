@@ -30,24 +30,19 @@ Git & GitHub Practices: We adhered exclusively to the Feature Branch workflow, d
 Code Review & Merging: Code integration was performed solely through Pull Requests (PRs), requiring mandatory peer review and approval before merging.
 
 ## Build & Run
-1. Server Environment (Docker Compose)
-To simplify the deployment and execution of the backend systems, we have containerized the environments using Docker. You can launch the servers from a single terminal:
-Ensure you have Docker and Docker Compose installed on your machine.
-Open a single terminal and navigate to the project's root directory (where the docker-compose.yml file is located).
-Run the following command to build the images and start all services simultaneously:
 
+We use a hybrid execution model for this project. **For a comprehensive, step-by-step breakdown and troubleshooting, please refer to [wiki/1_setup_and_run.md](wiki/1_setup_and_run.md).**
+
+### 1. Backend & Web Ecosystem
+Start the backend and web services using Docker Compose from the root directory:
 ```bash
-docker-compose up --build
+docker compose up -d
 ```
+and then you can go to **[http://localhost:4000](http://localhost:4000)** for the Web App.
 
-2. Client Environment (Android Emulator)
-To run and test the React Native mobile application, follow these steps:
-Ensure you have Android Studio installed along with an Android Virtual Device (AVD) configured and running.
-Ensure you have Node.js installed on your local machine.
-Open a new terminal and navigate to the React Native app directory (e.g., cd src/wolt-app).
-Start the Metro bundler and launch the app on your running Android emulator:
-
+### 2. Mobile App
+Run the React Native mobile app locally:
 ```bash
+cd src/wolt-app
 npx expo start
 ```
-(Then press a to open the app on Android).
