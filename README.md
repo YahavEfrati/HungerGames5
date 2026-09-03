@@ -1,7 +1,7 @@
-# Food Delivery Full-Stack Platform - Assignment 5 - HungerGames
+# Food Delivery Full-Stack Platform - HungerGames
 
 ## Project Description
-This project was developed as part of the Advanced Programming course. In this stage (Assignment 4), we expanded our backend architecture into a complete, full-stack web application inspired by real-world delivery platforms (like Wolt). 
+This project was developed as part of the Advanced Programming course. In this stage, we expanded our backend architecture into a complete, full-stack web application inspired by real-world delivery platforms (like Wolt). 
 
 The system now features a dynamic React frontend that communicates seamlessly with our previously built backend, presenting real, database-driven data to the users.
 
